@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2021 The Xaya developers
+// Copyright (C) 2019-2022 The Xaya developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,6 +11,7 @@
 #include "channelmanager.hpp"
 #include "movesender.hpp"
 #include "openchannel.hpp"
+#include "signatures.hpp"
 
 #include "rpc-stubs/channelgsprpcclient.h"
 
@@ -56,6 +57,11 @@ private:
     XayaRpcClient xayaRpc;
     /** The RPC client for the Xaya wallet.  */
     XayaWalletRpcClient xayaWallet;
+
+    /** Signature verifier (based on the RPC).  */
+    RpcSignatureVerifier verifier;
+    /** Signature signer based on RPC.  */
+    RpcSignatureSigner signer;
 
     /** The ChannelManager instance.  */
     ChannelManager cm;
