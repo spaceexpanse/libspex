@@ -2,7 +2,7 @@
 
 `libxgame` is a C++ library that makes it easy to implement games on the
 [SpaceXpanse platform](https://spacexpanse.org/).  It takes care of the interaction with
-the SpaceXpanse Core daemon, so that game developers only have to implement the
+the ROD Core daemon, so that game developers only have to implement the
 rules of their game.
 
 [`mover`](mover/README.md) is a simple game using this library, where players
