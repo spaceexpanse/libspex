@@ -44,7 +44,7 @@ jobs:
           .ccache
           .spacexpanse-params
         key: x86_64-unknown-linux-gnu-ccache-${{ env.NOW }} 
-        restore-keys: x86_64-unknown-linux-gnu-ccache-
+#        restore-keys: x86_64-unknown-linux-gnu-ccache-
     - run: |
         sudo apt-get update
         #sudo apt-get upgrade
@@ -67,7 +67,7 @@ jobs:
           depends/sdk-sources
           depends/x86_64-unknown-linux-gnu          
         key: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-${{ env.NOW }} 
-        restore-keys: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-
+#        restore-keys: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-
     - run: ./autogen.sh
     - run: ./configure --enable-reduce-exports --enable-zmq --enable-glibc-back-compat --with-gui=qt5 LDFLAGS=-static-libstdc++ CPPFLAGS=-DDEBUG_LOCKORDER
     - run: |
