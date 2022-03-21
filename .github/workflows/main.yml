@@ -56,7 +56,8 @@ jobs:
         sudo apt-add-repository "ppa:deadsnakes/ppa" -y
         sudo apt-get update
         #sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libboost-program-options-dev    
-        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libjsoncpp-dev libjsonrpccpp-dev libjsonrpccpp-tools libzmq3-dev zlib1g-dev ibsqlite3-dev liblmdb-dev libgoogle-glog-dev libgflags-dev python-protobuf libsecp256k1-dev python3-jsonrpclib-pelix    - uses: actions/checkout@v2
+        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libjsoncpp-dev libjsonrpccpp-dev libjsonrpccpp-tools libzmq3-dev zlib1g-dev ibsqlite3-dev liblmdb-dev libgoogle-glog-dev libgflags-dev python-protobuf libsecp256k1-dev python3-jsonrpclib-pelix
+    - uses: actions/checkout@v2
       with:
         ref: ${{ github.ref_name }}
     - uses: actions/cache@v2
