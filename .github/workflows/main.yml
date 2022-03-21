@@ -71,6 +71,7 @@ jobs:
         restore-keys: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-
     - run: ./autogen.sh
     #- run: ./configure --enable-reduce-exports --enable-zmq --enable-glibc-back-compat --with-gui=qt5 LDFLAGS=-static-libstdc++ CPPFLAGS=-DDEBUG_LOCKORDER
+    - run: ./configure --enable-reduce-exports --enable-zmq --enable-glibc-back-compat CPPFLAGS=-DDEBUG_LOCKORDER
     - run: |
         make -j2
         sudo make install # todo: make check /strip
@@ -159,6 +160,7 @@ jobs:
       #working-directory: depends
     - run: ./autogen.sh
     #- run: CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/ --with-gui=qt5 LDFLAGS=-Wa,-mbig-obj
+    - run: ./configure --prefix=/ LDFLAGS=-Wa,-mbig-obj
     - run: |
         make -j2
         #make deploy 
