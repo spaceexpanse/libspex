@@ -24,7 +24,7 @@ on:
 jobs:
   linux64:
 
-    runs-on: ubuntu-21.04
+    runs-on: ubuntu-20.04
     env:
       APT_BASE: ccache
       CCACHE_DIR: ${{ github.workspace }}/.ccache
@@ -56,7 +56,7 @@ jobs:
         sudo apt-add-repository "ppa:deadsnakes/ppa" -y
         sudo apt-get update
         #sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libboost-program-options-dev    
-        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libjsonrpccpp-dev libjsonrpccpp-tools libzmq3-dev zlib1g-dev libsqlite3-dev liblmdb-dev libgoogle-glog-dev libgflags-dev python-protobuf libsecp256k1-dev python3-jsonrpclib-pelix
+        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libstdc++6=11.\* libjsonrpccpp-dev libjsonrpccpp-tools libzmq3-dev zlib1g-dev libsqlite3-dev liblmdb-dev libgoogle-glog-dev libgflags-dev python-protobuf libsecp256k1-dev python3-jsonrpclib-pelix
         curl -O http://archive.ubuntu.com/ubuntu/pool/main/libj/libjsoncpp/libjsoncpp25_1.9.5-3_amd64.deb
         curl -O http://archive.ubuntu.com/ubuntu/pool/main/libj/libjsoncpp/libjsoncpp-dev_1.9.5-3_amd64.deb
         sudo dpkg -i libjsoncpp25_1.9.5-3_amd64.deb
