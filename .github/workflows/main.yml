@@ -156,7 +156,7 @@ jobs:
         PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
     - run: echo 1 | sudo update-alternatives --config x86_64-w64-mingw32-g++            
     - run: sudo bash -c "echo 0 > /proc/sys/fs/binfmt_misc/status" # Disable WSL support for Win32 applications.
-    - run: make -j2 -C depends HOST=x86_64-w64-mingw32
+    #- run: make -j2 -C depends HOST=x86_64-w64-mingw32
       #working-directory: depends
     - run: ./autogen.sh
     #- run: CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/ --with-gui=qt5 LDFLAGS=-Wa,-mbig-obj
