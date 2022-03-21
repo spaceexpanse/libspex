@@ -1,4 +1,4 @@
-name: CI
+name: Build CI
    
 on:
   push: 
@@ -55,8 +55,7 @@ jobs:
         sudo apt-add-repository "ppa:bitcoin/bitcoin" -y
         sudo apt-add-repository "ppa:deadsnakes/ppa" -y
         sudo apt-get update
-#        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libboost-program-options-dev    
-        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libjsoncpp-dev libjsonrpccpp-dev libjsonrpccpp-tools libzmq3-dev zlib1g-dev libsqlite3-dev liblmdb-dev libgoogle-glog-dev libgflags-dev python-protobuf libsecp256k1-dev python3-jsonrpclib-pelix 
+        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libboost-program-options-dev    
     - uses: actions/checkout@v2
       with:
         ref: ${{ github.ref_name }}
@@ -78,10 +77,10 @@ jobs:
       run: |
         mkdir -p deploy
         ls -lh
-        cp $GITHUB_WORKSPACE/src/* $GITHUB_WORKSPACE/deploy
+        cp $GITHUB_WORKSPACE/src/spacexpansed $GITHUB_WORKSPACE/src/spacexpanse-cli $GITHUB_WORKSPACE/src/spacexpanse-tx $GITHUB_WORKSPACE/src/spacexpanse-wallet $GITHUB_WORKSPACE/src/spacexpanse-util $GITHUB_WORKSPACE/src/qt/spacexpanse-qt $GITHUB_WORKSPACE/deploy
         ls -lh 
         strip $GITHUB_WORKSPACE/deploy/*
-        zip --junk-paths libxgame-bin-${{ github.job }} $GITHUB_WORKSPACE/deploy/*
+        zip --junk-paths spacexpanse-bin-${{ github.job }} $GITHUB_WORKSPACE/deploy/*
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -99,8 +98,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./libxgame-bin-${{ github.job }}.zip
-        asset_name: libxgame-bin-${{ github.job }}.zip
+        asset_path: ./spacexpanse-bin-${{ github.job }}.zip
+        asset_name: spacexpanse-bin-${{ github.job }}.zip
         asset_content_type: application/zip
 
   win64:
@@ -135,8 +134,7 @@ jobs:
         sudo apt-add-repository "ppa:bitcoin/bitcoin" -y
         sudo apt-add-repository "ppa:deadsnakes/ppa" -y
         sudo apt-get update
-#        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libboost-program-options-dev g++-mingw-w64-x86-64 nsis    
-        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libjsoncpp-dev libjsonrpccpp-dev libjsonrpccpp-tools libzmq3-dev zlib1g-dev libsqlite3-dev liblmdb-dev libgoogle-glog-dev libgflags-dev python-protobuf libsecp256k1-dev python3-jsonrpclib-pelix g++-mingw-w64-x86-64 nsis    
+        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libboost-program-options-dev g++-mingw-w64-x86-64 nsis    
     - uses: actions/checkout@v2
       with:
         ref: ${{ github.ref_name }}
@@ -168,8 +166,7 @@ jobs:
       run: |
         mkdir -p deploy
         ls -lh
-#        cp $GITHUB_WORKSPACE/src/spacexpansed.exe $GITHUB_WORKSPACE/src/spacexpanse-cli.exe $GITHUB_WORKSPACE/src/spacexpanse-tx.exe $GITHUB_WORKSPACE/src/spacexpanse-wallet.exe $GITHUB_WORKSPACE/src/spacexpanse-util.exe $GITHUB_WORKSPACE/src/qt/spacexpanse-qt.exe $GITHUB_WORKSPACE/deploy
-        cp $GITHUB_WORKSPACE/src/*.exe $GITHUB_WORKSPACE/deploy
+        cp $GITHUB_WORKSPACE/src/spacexpansed.exe $GITHUB_WORKSPACE/src/spacexpanse-cli.exe $GITHUB_WORKSPACE/src/spacexpanse-tx.exe $GITHUB_WORKSPACE/src/spacexpanse-wallet.exe $GITHUB_WORKSPACE/src/spacexpanse-util.exe $GITHUB_WORKSPACE/src/qt/spacexpanse-qt.exe $GITHUB_WORKSPACE/deploy
         ls -lh 
         strip $GITHUB_WORKSPACE/deploy/*
         zip --junk-paths spacexpanse-bin-${{ github.job }} $GITHUB_WORKSPACE/deploy/*
@@ -180,7 +177,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v.${{ github.ref_name }}.${{ github.run_number }}.rc1
-        release_name: libXgame ${{ github.ref_name }}.${{ github.run_number }}-${{ github.job }}
+        release_name: SpaceXpanse Core ${{ github.ref_name }}.${{ github.run_number }}-${{ github.job }}
         draft: true
         prerelease: false
     - name: Upload Release Asset
@@ -190,6 +187,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./libxgame-bin-${{ github.job }}.zip
-        asset_name: libxgame-bin-${{ github.job }}.zip
+        asset_path: ./spacexpanse-bin-${{ github.job }}.zip
+        asset_name: spacexpanse-bin-${{ github.job }}.zip
         asset_content_type: application/zip
