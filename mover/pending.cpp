@@ -1,4 +1,4 @@
-// Copyright (C) 2019 The Xaya developers
+// Copyright (C) 2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -25,7 +25,7 @@ PendingMoves::ToJson () const
 }
 
 void
-PendingMoves::AddPendingMoveInternal (const xaya::GameStateData& stateStr,
+PendingMoves::AddPendingMoveInternal (const spacexpanse::GameStateData& stateStr,
                                            const Json::Value& mv)
 {
   const std::string name = mv["name"].asString ();

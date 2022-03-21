@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2020 The Xaya developers
+// Copyright (C) 2018-2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,13 +9,13 @@
 
 #include "rpc-stubs/channelgsprpcserverstub.h"
 
-#include <xayagame/defaultmain.hpp>
-#include <xayagame/game.hpp>
+#include <xgame/defaultmain.hpp>
+#include <xgame/game.hpp>
 
 #include <json/json.h>
 #include <jsonrpccpp/server.h>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -86,6 +86,6 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_GSPRPC_HPP

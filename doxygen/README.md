@@ -1,6 +1,6 @@
-# Doxygen for libxayagame
+# Doxygen for libxgame
 
-In this folder you'll find a `Doxyfile` file. You can use this in Doxywizard to generate HTML and LaTex documentation for libxayagame. To do so:
+In this folder you'll find a `Doxyfile` file. You can use this in Doxywizard to generate HTML and LaTex documentation for libxgame. To do so:
 
 1. Open Doxywizard 
 1. Load `Doxyfile` (File > Open)

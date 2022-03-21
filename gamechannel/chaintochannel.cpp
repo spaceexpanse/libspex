@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2022 The Xaya developers
+// Copyright (C) 2018-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,14 +9,14 @@
 #include "proto/metadata.pb.h"
 #include "proto/stateproof.pb.h"
 
-#include <xayautil/base64.hpp>
+#include <xutil/base64.hpp>
 
 #include <jsonrpccpp/common/errors.h>
 #include <jsonrpccpp/common/exception.h>
 
 #include <glog/logging.h>
 
-namespace xaya
+namespace spacexpanse
 {
 
 ChainToChannelFeeder::ChainToChannelFeeder (ChannelGspRpcClient& r,
@@ -189,4 +189,4 @@ ChainToChannelFeeder::Stop ()
   loop.reset ();
 }
 
-} // namespace xaya
+} // namespace spacexpanse

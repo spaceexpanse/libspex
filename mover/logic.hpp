@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2019 The Xaya developers
+// Copyright (C) 2018-2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,8 +7,8 @@
 
 #include "proto/mover.pb.h"
 
-#include "xayagame/gamelogic.hpp"
-#include "xayagame/storage.hpp"
+#include "xgame/gamelogic.hpp"
+#include "xgame/storage.hpp"
 
 #include <json/json.h>
 
@@ -20,25 +20,25 @@ namespace mover
 /**
  * The actual implementation of the game rules.
  */
-class MoverLogic : public xaya::GameLogic
+class MoverLogic : public spacexpanse::GameLogic
 {
 
 protected:
 
-  xaya::GameStateData GetInitialStateInternal (unsigned& height,
+  spacexpanse::GameStateData GetInitialStateInternal (unsigned& height,
                                                std::string& hashHex) override;
 
-  xaya::GameStateData ProcessForwardInternal (
-      const xaya::GameStateData& oldState, const Json::Value& blockData,
-      xaya::UndoData& undo) override;
+  spacexpanse::GameStateData ProcessForwardInternal (
+      const spacexpanse::GameStateData& oldState, const Json::Value& blockData,
+      spacexpanse::UndoData& undo) override;
 
-  xaya::GameStateData ProcessBackwardsInternal (
-      const xaya::GameStateData& newState, const Json::Value& blockData,
-      const xaya::UndoData& undo) override;
+  spacexpanse::GameStateData ProcessBackwardsInternal (
+      const spacexpanse::GameStateData& newState, const Json::Value& blockData,
+      const spacexpanse::UndoData& undo) override;
 
 public:
 
-  Json::Value GameStateToJson (const xaya::GameStateData& state) override;
+  Json::Value GameStateToJson (const spacexpanse::GameStateData& state) override;
 
 };
 

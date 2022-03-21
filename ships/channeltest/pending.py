@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2019-2022 The Xaya developers
+# Copyright (C) 2019-2022 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -62,10 +62,10 @@ class PendingTest (ShipsTest):
       self.mainLogger.info ("Testing pending disputes...")
       self.generate (1)
       blk, _ = self.env.getChainTip ()
-      self.rpc.xaya.invalidateblock (blk)
+      self.rpc.spacexpanse.invalidateblock (blk)
       txid = bar.rpc.filedispute ()
       self.assertEqual (self.expectPendingMoves ("bar", ["d"]), [txid])
-      self.rpc.xaya.reconsiderblock (blk)
+      self.rpc.spacexpanse.reconsiderblock (blk)
       self.assertEqual (bar.rpc.filedispute (), "")
       self.assertEqual (self.expectPendingMoves ("bar", ["d"]), [txid])
       self.assertEqual (bar.getCurrentState ()["pending"], {
@@ -79,10 +79,10 @@ class PendingTest (ShipsTest):
       self.mainLogger.info ("Testing pending resolution...")
       self.generate (1)
       blk, _ = self.env.getChainTip ()
-      self.rpc.xaya.invalidateblock (blk)
+      self.rpc.spacexpanse.invalidateblock (blk)
       foo.rpc._notify.shoot (row=7, column=0)
       txids = self.expectPendingMoves ("foo", ["r"])
-      self.rpc.xaya.reconsiderblock (blk)
+      self.rpc.spacexpanse.reconsiderblock (blk)
       self.assertEqual (self.expectPendingMoves ("foo", ["r"]), txids)
       self.assertEqual (foo.getCurrentState ()["pending"], {
         "resolution": txids[0],

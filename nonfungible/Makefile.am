@@ -15,8 +15,8 @@ libnonfungible_la_CXXFLAGS = \
   -I$(top_srcdir) \
   $(JSONCPP_CFLAGS) $(SQLITE_CFLAGS) $(GLOG_CFLAGS)
 libnonfungible_la_LIBADD = \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(JSONCPP_LIBS) $(SQLITE_LIBS) $(GLOG_LIBS)
 libnonfungible_la_SOURCES = \
   assets.cpp \
@@ -41,8 +41,8 @@ nonfungibled_CXXFLAGS = \
   $(GLOG_CFLAGS) $(GFLAGS_CFLAGS)
 nonfungibled_LDADD = \
   $(builddir)/libnonfungible.la \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(GLOG_LIBS) $(GFLAGS_LIBS)
 nonfungibled_SOURCES = main.cpp \
   rpcserver.cpp
@@ -62,8 +62,8 @@ tests_CXXFLAGS = \
   $(JSONCPP_CFLAGS) $(SQLITE_CFLAGS) $(GLOG_CFLAGS)
 tests_LDADD = \
   $(builddir)/libnonfungible.la \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(GTEST_LIBS) \
   $(JSONCPP_LIBS) $(SQLITE_LIBS) $(GLOG_LIBS)
 tests_SOURCES = \

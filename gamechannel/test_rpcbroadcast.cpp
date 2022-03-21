@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2021 The Xaya developers
+// Copyright (C) 2018-2021 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,8 +6,8 @@
 
 #include "rpcbroadcast.hpp"
 
-#include <xayautil/hash.hpp>
-#include <xayautil/uint256.hpp>
+#include <xutil/hash.hpp>
+#include <xutil/uint256.hpp>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -44,7 +44,7 @@ template <typename S>
   return out;
 }
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -116,7 +116,7 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 int
 main (int argc, char** argv)
@@ -134,10 +134,10 @@ main (int argc, char** argv)
       return EXIT_FAILURE;
     }
 
-  const auto id1 = xaya::SHA256::Hash ("channel 1");
-  const auto id2 = xaya::SHA256::Hash ("channel 2");
+  const auto id1 = spacexpanse::SHA256::Hash ("channel 1");
+  const auto id2 = spacexpanse::SHA256::Hash ("channel 2");
 
-  using xaya::TestRpcBroadcast;
+  using spacexpanse::TestRpcBroadcast;
 
   TestRpcBroadcast bc1(FLAGS_rpc_url, id1);
   bc1.SendMessage ("foo");

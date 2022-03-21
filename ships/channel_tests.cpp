@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,9 +10,9 @@
 
 #include <gamechannel/protoutils.hpp>
 #include <gamechannel/testutils.hpp>
-#include <xayagame/testutils.hpp>
-#include <xayautil/base64.hpp>
-#include <xayautil/hash.hpp>
+#include <xgame/testutils.hpp>
+#include <xutil/base64.hpp>
+#include <xutil/hash.hpp>
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/util/message_differencer.h>
@@ -45,10 +45,10 @@ TextState (const std::string& str)
 /**
  * Parses a text-format state proof proto.
  */
-xaya::proto::StateProof
+spacexpanse::proto::StateProof
 TextProof (const std::string& str)
 {
-  xaya::proto::StateProof res;
+  spacexpanse::proto::StateProof res;
   CHECK (TextFormat::ParseFromString (str, &res));
   return res;
 }
@@ -58,12 +58,12 @@ class ChannelTests : public testing::Test
 
 protected:
 
-  const xaya::uint256 channelId = xaya::SHA256::Hash ("foo");
+  const spacexpanse::uint256 channelId = spacexpanse::SHA256::Hash ("foo");
 
   /**
    * Two metadata instances, where "we" are either the first or second player.
    */
-  xaya::proto::ChannelMetadata meta[2];
+  spacexpanse::proto::ChannelMetadata meta[2];
 
   ShipsBoardRules rules;
   ShipsChannel channel;
@@ -105,7 +105,7 @@ protected:
    * associates the correct metadata instance, where the current player
    * is the one to play next.
    */
-  std::unique_ptr<xaya::ParsedBoardState>
+  std::unique_ptr<spacexpanse::ParsedBoardState>
   ParseState (const proto::BoardState& pb)
   {
     /* In some situations, pb.turn might not be set.  But then we just use
@@ -117,9 +117,9 @@ protected:
    * Parses a BoardState proto into a ParsedBoardState, using the given
    * metadata instance.
    */
-  std::unique_ptr<xaya::ParsedBoardState>
+  std::unique_ptr<spacexpanse::ParsedBoardState>
   ParseState (const proto::BoardState& pb,
-              const xaya::proto::ChannelMetadata& m)
+              const spacexpanse::proto::ChannelMetadata& m)
   {
     std::string serialised;
     CHECK (pb.SerializeToString (&serialised));
@@ -139,8 +139,8 @@ class OnChainMoveTests : public ChannelTests
 
 protected:
 
-  xaya::MockTransactionSender txSender;
-  xaya::MoveSender sender;
+  spacexpanse::MockTransactionSender txSender;
+  spacexpanse::MoveSender sender;
 
   OnChainMoveTests ()
     : sender("xs", channelId, "player", txSender, channel)
@@ -150,7 +150,7 @@ protected:
    * Parses a BoardState proto into a ParsedBoardState.  It uses the
    * metadata instance where the channel's user "player" is the first one.
    */
-  std::unique_ptr<xaya::ParsedBoardState>
+  std::unique_ptr<spacexpanse::ParsedBoardState>
   ParseState (const proto::BoardState& pb)
   {
     return ChannelTests::ParseState (pb, meta[0]);
@@ -166,7 +166,7 @@ protected:
     static bool
     IsExpectedMove (const Json::Value& actual,
                     const std::string& key, const std::string& protoKey,
-                    const xaya::uint256& id, const Proto& expectedPb)
+                    const spacexpanse::uint256& id, const Proto& expectedPb)
   {
     if (!actual.isObject ())
       return false;
@@ -188,7 +188,7 @@ protected:
       return false;
 
     Proto actualPb;
-    if (!xaya::ProtoFromBase64 (sub[protoKey].asString (), actualPb))
+    if (!spacexpanse::ProtoFromBase64 (sub[protoKey].asString (), actualPb))
       return false;
 
     return MessageDifferencer::Equals (actualPb, expectedPb);
@@ -199,8 +199,8 @@ protected:
    * for a loss declaration.
    */
   static bool
-  IsExpectedLoss (const Json::Value& actual, const xaya::uint256& id,
-                  const xaya::proto::ChannelMetadata& meta)
+  IsExpectedLoss (const Json::Value& actual, const spacexpanse::uint256& id,
+                  const spacexpanse::proto::ChannelMetadata& meta)
   {
     if (!actual.isObject ())
       return false;
@@ -221,7 +221,7 @@ protected:
     if (!sub["r"].isString ())
       return false;
     std::string reinit;
-    if (!xaya::DecodeBase64 (sub["r"].asString (), reinit))
+    if (!spacexpanse::DecodeBase64 (sub["r"].asString (), reinit))
       return false;
     if (reinit != meta.reinit ())
       return false;
@@ -339,7 +339,7 @@ TEST_F (PositionStoringTests, InvalidPosition)
 /* ************************************************************************** */
 
 /**
- * Basic tests for automoves with Xayaships.  Those verify only some situations
+ * Basic tests for automoves with Xships.  Those verify only some situations
  * including edge cases.  Other verification (e.g. that the actual hash values
  * work fine with revealing later) is done separately with tests that run
  * a full board game through the move processor.
@@ -370,9 +370,9 @@ protected:
    * Calls MaybeAutoMove on our channel and verifies that there is no automove.
    */
   void
-  ExpectNoAutoMove (const xaya::ParsedBoardState& state)
+  ExpectNoAutoMove (const spacexpanse::ParsedBoardState& state)
   {
-    xaya::BoardMove mv;
+    spacexpanse::BoardMove mv;
     ASSERT_FALSE (channel.MaybeAutoMove (state, mv));
   }
 
@@ -381,9 +381,9 @@ protected:
    * and returns the resulting proto.
    */
   proto::BoardMove
-  ExpectAutoMove (const xaya::ParsedBoardState& state)
+  ExpectAutoMove (const spacexpanse::ParsedBoardState& state)
   {
-    xaya::BoardMove mv;
+    spacexpanse::BoardMove mv;
     if (!channel.MaybeAutoMove (state, mv))
       {
         ADD_FAILURE () << "No auto move provided, expected one";
@@ -553,7 +553,7 @@ protected:
   ShipsChannel otherChannel;
 
   /** The current game state.  This is updated as moves are made.  */
-  std::unique_ptr<xaya::ParsedBoardState> state;
+  std::unique_ptr<spacexpanse::ParsedBoardState> state;
 
   FullGameTests ()
     : otherChannel("other player")
@@ -608,7 +608,7 @@ protected:
   GetCurrentChannel ()
   {
     const int turn = state->WhoseTurn ();
-    CHECK_NE (turn, xaya::ParsedBoardState::NO_TURN);
+    CHECK_NE (turn, spacexpanse::ParsedBoardState::NO_TURN);
     return *channels[turn];
   }
 
@@ -618,10 +618,10 @@ protected:
   void
   ProcessMove (const proto::BoardMove& mv)
   {
-    xaya::BoardMove serialised;
+    spacexpanse::BoardMove serialised;
     CHECK (mv.SerializeToString (&serialised));
 
-    xaya::BoardState newState;
+    spacexpanse::BoardState newState;
     CHECK (state->ApplyMove (serialised, newState));
 
     state = rules.ParseState (channelId, meta[0], newState);
@@ -638,10 +638,10 @@ protected:
     bool res = false;
     while (true)
       {
-        if (state->WhoseTurn () == xaya::ParsedBoardState::NO_TURN)
+        if (state->WhoseTurn () == spacexpanse::ParsedBoardState::NO_TURN)
           return res;
 
-        xaya::BoardMove mv;
+        spacexpanse::BoardMove mv;
         if (!GetCurrentChannel ().MaybeAutoMove (*state, mv))
           return res;
 
@@ -659,7 +659,7 @@ protected:
   void
   ExpectWinner (const int winner) const
   {
-    ASSERT_EQ (state->WhoseTurn (), xaya::ParsedBoardState::NO_TURN);
+    ASSERT_EQ (state->WhoseTurn (), spacexpanse::ParsedBoardState::NO_TURN);
 
     const auto& shipsState = dynamic_cast<const ShipsBoardState&> (*state);
     const auto& pb = shipsState.GetState ();
@@ -706,7 +706,7 @@ TEST_F (FullGameTests, WithShots)
   ProcessAuto ();
 
   int nextTarget[] = {0, 0};
-  while (state->WhoseTurn () != xaya::ParsedBoardState::NO_TURN)
+  while (state->WhoseTurn () != spacexpanse::ParsedBoardState::NO_TURN)
     {
       const Coord target(nextTarget[state->WhoseTurn ()]++);
       ProcessMove (GetCurrentChannel ().GetShotMove (target));

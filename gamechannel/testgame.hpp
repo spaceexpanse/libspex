@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -15,9 +15,9 @@
 #include "proto/metadata.pb.h"
 #include "proto/stateproof.pb.h"
 
-#include <xayagame/sqlitestorage.hpp>
-#include <xayagame/testutils.hpp>
-#include <xayautil/uint256.hpp>
+#include <xgame/sqlitestorage.hpp>
+#include <xgame/testutils.hpp>
+#include <xutil/uint256.hpp>
 
 #include <json/json.h>
 
@@ -26,7 +26,7 @@
 #include <memory>
 #include <string>
 
-namespace xaya
+namespace spacexpanse
 {
 
 class TestGameFixture;
@@ -173,6 +173,6 @@ protected:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_TESTGAME_HPP

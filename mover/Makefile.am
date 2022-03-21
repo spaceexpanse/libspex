@@ -12,8 +12,8 @@ libmover_la_CXXFLAGS = \
   -I$(top_srcdir) \
   $(JSONCPP_CFLAGS) $(GLOG_CFLAGS) $(PROTOBUF_CFLAGS)
 libmover_la_LIBADD = \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(JSONCPP_LIBS) $(GLOG_LIBS) $(PROTOBUF_LIBS)
 libmover_la_SOURCES = \
   logic.cpp \
@@ -33,8 +33,8 @@ moverd_CXXFLAGS = \
   $(GFLAGS_CFLAGS) $(PROTOBUF_CFLAGS)
 moverd_LDADD = \
   $(builddir)/libmover.la \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(GFLAGS_LIBS) $(PROTOBUF_LIBS)
 moverd_SOURCES = main.cpp
 

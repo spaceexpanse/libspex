@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -31,7 +31,7 @@ using AllAssets = std::map<Asset, std::string>;
  * the given expected set.
  */
 void
-ExpectAssets (const xaya::SQLiteDatabase& db, const AllAssets& expected)
+ExpectAssets (const spacexpanse::SQLiteDatabase& db, const AllAssets& expected)
 {
   auto stmt = db.PrepareRo (R"(
     SELECT `minter`, `asset`, `data`
@@ -66,7 +66,7 @@ using AllBalances = std::map<std::string, std::map<Asset, Amount>>;
  * the given expected set.
  */
 void
-ExpectBalances (const xaya::SQLiteDatabase& db, const AllBalances& expected)
+ExpectBalances (const spacexpanse::SQLiteDatabase& db, const AllBalances& expected)
 {
   auto stmt = db.PrepareRo (R"(
     SELECT `name`, `minter`, `asset`, `balance`
@@ -206,14 +206,14 @@ TEST_F (MoveProcessorTests, ValidTransfer)
     {"t": {"a": {"m": "domob", "a": "foo"}, "n": 5, "r": "andy"}},
     {"t": {"a": {"m": "domob", "a": "foo"}, "n": 5, "r": "domob"}},
     {"t": {"a": {"m": "domob", "a": "bar"}, "n": 10, "r": ""}},
-    {"t": {"a": {"m": "domob", "a": "bar"}, "n": 10, "r": "invalid\nxaya"}}
+    {"t": {"a": {"m": "domob", "a": "bar"}, "n": 10, "r": "invalid\nx"}}
   ])");
 
   ExpectBalances (GetDb (), {
     {"domob", {{Asset ("domob", "foo"), 5}}},
     {"andy", {{Asset ("domob", "foo"), 15}}},
     {"", {{Asset ("domob", "bar"), 10}}},
-    {"invalid\nxaya", {{Asset ("domob", "bar"), 10}}},
+    {"invalid\nx", {{Asset ("domob", "bar"), 10}}},
   });
 }
 

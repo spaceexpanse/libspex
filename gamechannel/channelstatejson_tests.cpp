@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,7 +6,7 @@
 
 #include "protoutils.hpp"
 
-#include <xayautil/base64.hpp>
+#include <xutil/base64.hpp>
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/util/message_differencer.h>
@@ -16,7 +16,7 @@
 using google::protobuf::TextFormat;
 using google::protobuf::util::MessageDifferencer;
 
-namespace xaya
+namespace spacexpanse
 {
 
 void
@@ -107,4 +107,4 @@ TEST_F (ChannelStateJsonTests, BoardStateToJson)
 }
 
 } // anonymous namespace
-} // namespace xaya
+} // namespace spacexpanse

@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,7 +6,7 @@
 
 #include "statejson.hpp"
 
-#include "xayagame/gamerpcserver.hpp"
+#include "xgame/gamerpcserver.hpp"
 
 #include <jsonrpccpp/common/errors.h>
 #include <jsonrpccpp/common/exception.h>
@@ -72,7 +72,7 @@ std::string
 RpcServer::waitforchange (const std::string& knownBlock)
 {
   LOG (INFO) << "RPC method called: waitforchange " << knownBlock;
-  return xaya::GameRpcServer::DefaultWaitForChange (game, knownBlock);
+  return spacexpanse::GameRpcServer::DefaultWaitForChange (game, knownBlock);
 }
 
 Json::Value

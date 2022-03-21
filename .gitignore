@@ -33,3 +33,5 @@ Makefile.in
 
 .dirstamp
 tests
+
+*.~*

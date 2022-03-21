@@ -9,4 +9,4 @@ InternalSetupGameChannelsSchema (SQLiteDatabase& db)
   db.Execute (SCHEMA_SQL);
 }
 
-} // namespace xaya
+} // namespace spacexpanse

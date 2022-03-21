@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2022 The Xaya developers
+// Copyright (C) 2018-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,7 +13,7 @@
 #include <atomic>
 #include <thread>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -93,6 +93,6 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_CHAINTOCHANNEL_HPP

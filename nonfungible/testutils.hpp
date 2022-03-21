@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,7 +7,7 @@
 
 #include "assets.hpp"
 
-#include "xayagame/sqlitestorage.hpp"
+#include "xgame/sqlitestorage.hpp"
 
 #include <gtest/gtest.h>
 
@@ -34,7 +34,7 @@ class DBTest : public testing::Test
 
 private:
 
-  xaya::SQLiteDatabase db;
+  spacexpanse::SQLiteDatabase db;
 
 protected:
 
@@ -43,7 +43,7 @@ protected:
   /**
    * Returns a Database instance for the test.
    */
-  xaya::SQLiteDatabase&
+  spacexpanse::SQLiteDatabase&
   GetDb ()
   {
     return db;

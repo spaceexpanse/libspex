@@ -24,8 +24,8 @@ libships_la_CXXFLAGS = \
   -I$(top_srcdir) \
   $(JSONCPP_CFLAGS) $(SQLITE3_CFLAGS) $(GLOG_CFLAGS) $(PROTOBUF_CFLAGS)
 libships_la_LIBADD = \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(top_builddir)/gamechannel/libchannelcore.la \
   $(top_builddir)/gamechannel/libgamechannel.la \
   $(JSONCPP_LIBS) $(SQLITE3_CFLAGS) $(GLOG_LIBS) $(PROTOBUF_LIBS)
@@ -54,8 +54,8 @@ shipsd_CXXFLAGS = \
   $(JSONCPP_CFLAGS) $(GLOG_CFLAGS) $(GFLAGS_CFLAGS) $(PROTOBUF_CFLAGS)
 shipsd_LDADD = \
   $(builddir)/libships.la \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(top_builddir)/gamechannel/libchannelcore.la \
   $(top_builddir)/gamechannel/libgamechannel.la \
   $(JSONCPP_LIBS) $(GLOG_LIBS) $(GFLAGS_LIBS) $(PROTOBUF_LIBS)
@@ -67,8 +67,8 @@ ships_channel_CXXFLAGS = \
   $(GLOG_CFLAGS) $(GFLAGS_CFLAGS) $(PROTOBUF_CFLAGS)
 ships_channel_LDADD = \
   $(builddir)/libships.la \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(top_builddir)/gamechannel/libchannelcore.la \
   $(top_builddir)/gamechannel/libgamechannel.la \
   $(JSONCPP_LIBS) $(JSONRPCSERVER_LIBS) \
@@ -90,9 +90,9 @@ tests_CXXFLAGS = \
   $(JSONCPP_CFLAGS) $(GLOG_CFLAGS) $(GTEST_CFLAGS) $(PROTOBUF_CFLAGS)
 tests_LDADD = \
   $(builddir)/libships.la \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libtestutils.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libtestutils.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(top_builddir)/gamechannel/libchannelcore.la \
   $(top_builddir)/gamechannel/libgamechannel.la \
   $(top_builddir)/gamechannel/libtestutils.la \

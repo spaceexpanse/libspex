@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,8 +8,8 @@
 #include "assets.hpp"
 #include "moveparser.hpp"
 
-#include <xayagame/sqlitegame.hpp>
-#include <xayagame/sqlitestorage.hpp>
+#include <xgame/sqlitegame.hpp>
+#include <xgame/sqlitestorage.hpp>
 
 #include <json/json.h>
 
@@ -110,16 +110,16 @@ protected:
 
 public:
 
-  explicit PendingStateUpdater (const xaya::SQLiteDatabase& d, PendingState& s)
+  explicit PendingStateUpdater (const spacexpanse::SQLiteDatabase& d, PendingState& s)
     : MoveParser(d), state(s)
   {}
 
 };
 
 /**
- * The tracker for pending moves, using the libxayagame framework.
+ * The tracker for pending moves, using the libxgame framework.
  */
-class PendingMoves : public xaya::SQLiteGame::PendingMoves
+class PendingMoves : public spacexpanse::SQLiteGame::PendingMoves
 {
 
 private:

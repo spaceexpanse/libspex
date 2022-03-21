@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2020 The Xaya developers
+// Copyright (C) 2019-2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,12 +10,12 @@
 #include "proto/metadata.pb.h"
 #include "proto/stateproof.pb.h"
 
-#include <xayagame/sqlitestorage.hpp>
-#include <xayautil/uint256.hpp>
+#include <xgame/sqlitestorage.hpp>
+#include <xutil/uint256.hpp>
 
 #include <memory>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -184,6 +184,6 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_DATABASE_HPP

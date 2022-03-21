@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,13 +8,13 @@
 #include "openchannel.hpp"
 #include "proto/stateproof.pb.h"
 
-#include <xayautil/uint256.hpp>
+#include <xutil/uint256.hpp>
 
 #include <json/writer.h>
 
 #include <string>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /* ************************************************************************** */
@@ -75,7 +75,7 @@ private:
   /** ID of the game channel this is for.  */
   const uint256 channelId;
 
-  /** The Xaya name that should be updated (without p/ prefix).  */
+  /** The SpaceXpanse name that should be updated (without p/ prefix).  */
   const std::string playerName;
 
   /** The game ID for constructing moves.  */
@@ -135,6 +135,6 @@ public:
 
 /* ************************************************************************** */
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_MOVESENDER_HPP

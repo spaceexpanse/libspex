@@ -1,14 +1,14 @@
-# Copyright (C) 2020 The Xaya developers
+# Copyright (C) 2020 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-from xayagametest.testcase import XayaGameTest
+from xgametest.testcase import XGameTest
 
 import os
 import os.path
 
 
-class NonFungibleTest (XayaGameTest):
+class NonFungibleTest (XGameTest):
   """
   An integration test for the non-fungible GSP.
   """

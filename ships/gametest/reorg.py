@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2019-2022 The Xaya developers
+# Copyright (C) 2019-2022 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -28,7 +28,7 @@ class ReorgTest (ShipsTest):
     _, disputeHeight = self.env.getChainTip ()
     self.expectChannelState (cid, "first commitment", disputeHeight)
     self.generate (1)
-    reorgBlock = self.rpc.xaya.getbestblockhash ()
+    reorgBlock = self.rpc.spacexpanse.getbestblockhash ()
 
     # Let the dispute expire.
     self.mainLogger.info ("Letting the dispute expire...")
@@ -45,7 +45,7 @@ class ReorgTest (ShipsTest):
 
     # Reorg back and close the channel through a loss declaration.
     self.mainLogger.info ("Reorg and create alternate reality...")
-    self.rpc.xaya.invalidateblock (reorgBlock)
+    self.rpc.spacexpanse.invalidateblock (reorgBlock)
     self.expectChannelState (cid, "first commitment", disputeHeight)
     ch = self.getGameState ()["channels"][cid]
     self.sendMove ("bar", {"l": {"id": cid, "r": ch["meta"]["reinit"]}})
@@ -61,7 +61,7 @@ class ReorgTest (ShipsTest):
 
     # Get back to the original chain.
     self.mainLogger.info ("Revert to original reality...")
-    self.rpc.xaya.reconsiderblock (reorgBlock)
+    self.rpc.spacexpanse.reconsiderblock (reorgBlock)
     self.expectGameState (originalState)
 
 

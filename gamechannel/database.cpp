@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2020 The Xaya developers
+// Copyright (C) 2019-2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +10,7 @@
 
 #include <set>
 
-namespace xaya
+namespace spacexpanse
 {
 
 namespace
@@ -92,7 +92,7 @@ ChannelData::~ChannelData ()
   LOG (INFO) << "ChannelData " << id.ToHex () << " is dirty, updating...";
 
   auto stmt = db.Prepare (R"(
-    INSERT OR REPLACE INTO `xayagame_game_channels`
+    INSERT OR REPLACE INTO `xgame_game_channels`
       (`id`, `metadata`, `reinit`, `stateproof`, `disputeHeight`)
       VALUES (?1, ?2, ?3, ?4, ?5)
   )");
@@ -196,7 +196,7 @@ ChannelsTable::GetById (const uint256& id)
 {
   auto stmt = db.PrepareRo (R"(
     SELECT `id`, `metadata`, `reinit`, `stateproof`, `disputeHeight`
-      FROM `xayagame_game_channels`
+      FROM `xgame_game_channels`
       WHERE `id` = ?1
   )");
 
@@ -221,7 +221,7 @@ void
 ChannelsTable::DeleteById (const uint256& id)
 {
   auto stmt = db.Prepare (R"(
-    DELETE FROM `xayagame_game_channels`
+    DELETE FROM `xgame_game_channels`
       WHERE `id` = ?1
   )");
   stmt.Bind (1, id);
@@ -233,7 +233,7 @@ ChannelsTable::QueryAll ()
 {
   return db.PrepareRo (R"(
     SELECT `id`, `metadata`, `reinit`, `stateproof`, `disputeHeight`
-      FROM `xayagame_game_channels`
+      FROM `xgame_game_channels`
       ORDER BY `id`
   )");
 }
@@ -243,7 +243,7 @@ ChannelsTable::QueryForDisputeHeight (const unsigned height)
 {
   auto stmt = db.PrepareRo (R"(
     SELECT `id`, `metadata`, `reinit`, `stateproof`, `disputeHeight`
-      FROM `xayagame_game_channels`
+      FROM `xgame_game_channels`
       WHERE `disputeHeight` <= ?1
       ORDER BY `id`
   )");
@@ -253,4 +253,4 @@ ChannelsTable::QueryForDisputeHeight (const unsigned height)
   return stmt;
 }
 
-} // namespace xaya
+} // namespace spacexpanse

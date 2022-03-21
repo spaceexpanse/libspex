@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,7 +8,7 @@
 #include "stateproof.hpp"
 #include "testgame.hpp"
 
-#include <xayautil/hash.hpp>
+#include <xutil/hash.hpp>
 
 #include <google/protobuf/text_format.h>
 
@@ -16,7 +16,7 @@
 
 #include <glog/logging.h>
 
-namespace xaya
+namespace spacexpanse
 {
 namespace
 {
@@ -452,7 +452,7 @@ protected:
     : proc(game)
   {
     /* All tests work without requiring a signature verifier, thus we
-       do not need to set a mock Xaya RPC server.  */
+       do not need to set a mock SpaceXpanse RPC server.  */
     proc.InitialiseGameContext (Chain::MAIN, "add", nullptr);
   }
 
@@ -631,4 +631,4 @@ TEST (UpdateMetadataReinitTests, Works)
 /* ************************************************************************** */
 
 } // anonymous namespace
-} // namespace xaya
+} // namespace spacexpanse

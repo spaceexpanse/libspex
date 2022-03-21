@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2019-2022 The Xaya developers
+# Copyright (C) 2019-2022 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -84,7 +84,7 @@ class DisputesTest (ShipsTest):
         "height": self.env.getChainTip ()[1] - 1,
       })
       self.expectPendingMoves ("foo", ["r"])
-      pending = self.rpc.xaya.name_pending ("p/foo")
+      pending = self.rpc.spacexpanse.name_pending ("p/foo")
       self.assertEqual (len (pending), 1)
       self.assertEqual (state["pending"], {
         "resolution": pending[0]["txid"],

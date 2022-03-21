@@ -1,6 +1,6 @@
-# Xayaships
+# Xships
 
-*Xayaships* is an example game on the Xaya platform, demonstrating how
+*Xships* is an example game on the SpaceXpanse platform, demonstrating how
 [**game
 channels**](http://www.ledgerjournal.org/ojs/index.php/ledger/article/view/15)
 can be used for trustless and fully decentralised, scalable off-chain gaming.
@@ -10,17 +10,17 @@ This is a simple implementation of the classical game
 players compete against each other and scores are recorded in the
 on-chain game state for eternity.
 
-Note that Xayaships is mainly intended to be an example game for demonstrating
+Note that Xships is mainly intended to be an example game for demonstrating
 the capabilities of game channels, testing the implementation and releasing
 code that can be used and extended for other games.  Nevertheless, it provides
 a fully-functional game, that is still fun to play.
 
-The [game ID](https://github.com/xaya/xaya/blob/master/doc/xaya/games.md#games)
-of Xayaships is `g/xs`.
+The [game ID](https://github.com/spacexpanse/spacexpanse/blob/master/doc/spacexpanse/games.md#games)
+of Xships is `g/xs`.
 
 ## Game Overview
 
-The on-chain game state of Xayaships keeps track, for each Xaya username,
+The on-chain game state of Xships keeps track, for each SpaceXpanse username,
 of how many games that user has won and lost.  It also stores the
 currently open game channels as needed to process disputes.
 
@@ -135,10 +135,10 @@ enemy ships first can ensure they win the game.
 
 ### Game State and Moves
 
-Xayaships uses the game ID `xs` for its on-chain GSP.  The global game state
+Xships uses the game ID `xs` for its on-chain GSP.  The global game state
 consists of two types of data:
 
-1. The statistics of won and lost games per Xaya name are stored in a simple
+1. The statistics of won and lost games per SpaceXpanse name are stored in a simple
    SQLite database table.
 1. Data about currently open game channels is stored through the game-channels
    framework (which has also its own table in the SQLite database).
@@ -154,7 +154,7 @@ can be used as move:
     {"c": {"addr": ADDRESS}}
 
 Here, `ADDRESS` must be a string, and it will be set as signing address
-for the player in the channel.  (It need not be a valid Xaya address, but
+for the player in the channel.  (It need not be a valid SpaceXpanse address, but
 if it isn't, then obviously no messages can be signed on the channel
 successfully.)
 
@@ -173,7 +173,7 @@ As with creating a channel, `ADDRESS` is the signing address the player
 wishes to use within the channel.  `CHANNEL-ID` is the ID of the channel they
 want to join, given as hex string.
 Joining a channel is not possible if the channel already has two participants
-or if the other participant is the same Xaya account (`p/` name).
+or if the other participant is the same SpaceXpanse account (`p/` name).
 
 After a second player joins a channel successfully, the on-channel game
 begins properly.
@@ -222,7 +222,7 @@ which will also close the channel.
 #### <a name="disputes">Dispute Handling</a>
 
 Disputes and resolutions can be processed by providing a
-[state proof](https://github.com/xaya/libxayagame/blob/master/gamechannel/proto/stateproof.proto)
+[state proof](https://github.com/spacexpanse/libxgame/blob/master/gamechannel/proto/stateproof.proto)
 in a move.  To open a dispute in a channel, the move looks like this:
 
     {"d": {"id": CHANNEL-ID, "state": STATE-PROOF}}

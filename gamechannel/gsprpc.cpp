@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2020 The Xaya developers
+// Copyright (C) 2018-2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,14 +7,14 @@
 #include "database.hpp"
 #include "gamestatejson.hpp"
 
-#include <xayagame/gamerpcserver.hpp>
+#include <xgame/gamerpcserver.hpp>
 
 #include <glog/logging.h>
 
 #include <jsonrpccpp/common/errors.h>
 #include <jsonrpccpp/common/exception.h>
 
-namespace xaya
+namespace spacexpanse
 {
 
 void
@@ -100,4 +100,4 @@ ChannelGspInstanceFactory::BuildRpcServer (
   return res;
 }
 
-} // namespace xaya
+} // namespace spacexpanse

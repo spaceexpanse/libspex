@@ -1,11 +1,11 @@
-# Builds a Docker image that contains the Xaya ships binaries as well as
-# Charon binaries for running the Xayaships GSP client/server for
+# Builds a Docker image that contains the SpaceXpanse ships binaries as well as
+# Charon binaries for running the Xships GSP client/server for
 # light mode.
 
-# Note:  This image is based on xaya/charon, which itself is based on
-# xaya/libxayagame, not on the libxayagame image directly!
+# Note:  This image is based on spacexpanse/charon, which itself is based on
+# spacexpanse/libxgame, not on the libxgame image directly!
 
-FROM xaya/charon AS build
+FROM spacexpanse/charon AS build
 
 # Collect the binaries and required libraries.  Also add in the Charon
 # binaries.
@@ -24,8 +24,8 @@ COPY ships/docker/entrypoint.sh bin/
 FROM alpine
 COPY --from=build /jail /usr/local/
 ENV LD_LIBRARY_PATH "/usr/local/lib64"
-ENV XAYAGAME_DIR "/xayagame"
-LABEL description="Xayaships GSP with Charon"
+ENV XAYAGAME_DIR "/xgame"
+LABEL description="Xships GSP with Charon"
 VOLUME ["/log"]
 ENV GLOG_log_dir "/log"
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

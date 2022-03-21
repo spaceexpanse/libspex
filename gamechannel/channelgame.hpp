@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,10 +13,10 @@
 #include "proto/metadata.pb.h"
 #include "proto/stateproof.pb.h"
 
-#include <xayagame/sqlitegame.hpp>
-#include <xayautil/uint256.hpp>
+#include <xgame/sqlitegame.hpp>
+#include <xutil/uint256.hpp>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -34,7 +34,7 @@ private:
   /**
    * The default signature verifier based on the game's underlying
    * RPC connection.  This is lazy constructed on first request (and then
-   * uses GetXayaRpc() under the hood).
+   * uses GetXRpc() under the hood).
    */
   std::unique_ptr<RpcSignatureVerifier> verifier;
 
@@ -58,7 +58,7 @@ protected:
    * It is valid to open a dispute for the state that is currently on-chain
    * (same turn height but only if it actually Equals() that state) if there
    * was not already a dispute for it.  This is necessary to avoid a situation
-   * as in https://github.com/xaya/libxayagame/issues/51.
+   * as in https://github.com/spacexpanse/libxgame/issues/51.
    */
   bool ProcessDispute (ChannelData& ch, unsigned height,
                        const proto::StateProof& proof);
@@ -75,7 +75,7 @@ protected:
 
   /**
    * Returns the signature verifier to be used for the game's state proofs.
-   * By default, it uses verification based on the Xaya RPC "verifymessage",
+   * By default, it uses verification based on the SpaceXpanse RPC "verifymessage",
    * but that can be overridden by subclasses if desired.
    */
   virtual const SignatureVerifier& GetSignatureVerifier ();
@@ -179,6 +179,6 @@ public:
  */
 void UpdateMetadataReinit (const uint256& txid, proto::ChannelMetadata& meta);
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_CHANNELGAME_HPP

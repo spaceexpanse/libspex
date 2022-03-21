@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,13 +9,13 @@
 namespace nf
 {
 
-xaya::SQLiteDatabase&
+spacexpanse::SQLiteDatabase&
 MoveProcessor::MutableDb ()
 {
   /* The constructor of MoveProcessor expects a mutable database, which is
      then just stored in a const& in MoveParser.  Thus it is fine to
      const-cast it back to be mutable here.  */
-  return const_cast<xaya::SQLiteDatabase&> (db);
+  return const_cast<spacexpanse::SQLiteDatabase&> (db);
 }
 
 void

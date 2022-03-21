@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2021-2022 The Xaya developers
+# Copyright (C) 2021-2022 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -14,8 +14,8 @@ from shipstest import ShipsTest
 class ForceCloseTest (ShipsTest):
 
   def run (self):
-    myAddr = self.rpc.xaya.getnewaddress ()
-    self.rpc.xaya.generatetoaddress (10, myAddr)
+    myAddr = self.rpc.spacexpanse.getnewaddress ()
+    self.rpc.spacexpanse.generatetoaddress (10, myAddr)
     self.generate (150)
 
     self.mainLogger.info ("Creating test channel...")
@@ -91,7 +91,7 @@ class ForceCloseTest (ShipsTest):
     """
 
     notMine = "cdpSgeapVR8ZgRkqA8zF3fDJ2NgaUqm2pu"
-    self.rpc.xaya.generatetoaddress (n, notMine)
+    self.rpc.spacexpanse.generatetoaddress (n, notMine)
 
 
 if __name__ == "__main__":

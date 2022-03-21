@@ -1,14 +1,14 @@
-// Copyright (C) 2019 The Xaya developers
+// Copyright (C) 2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 /* Template implementation code for protoutils.hpp.  */
 
-#include <xayautil/base64.hpp>
+#include <xutil/base64.hpp>
 
 #include <glog/logging.h>
 
-namespace xaya
+namespace spacexpanse
 {
 
 template <typename Proto>
@@ -40,4 +40,4 @@ template <typename Proto>
   return true;
 }
 
-} // namespace xaya
+} // namespace spacexpanse

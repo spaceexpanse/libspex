@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -23,7 +23,7 @@ using testing::_;
 using testing::Return;
 using testing::Truly;
 
-namespace xaya
+namespace spacexpanse
 {
 
 /* ************************************************************************** */
@@ -720,4 +720,4 @@ TEST_F (ChannelToJsonTests, PendingResolution)
 /* ************************************************************************** */
 
 } // anonymous namespace
-} // namespace xaya
+} // namespace spacexpanse

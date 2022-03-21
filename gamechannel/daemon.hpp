@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,14 +16,14 @@
 
 #include "rpc-stubs/channelgsprpcclient.h"
 
-#include <xayagame/mainloop.hpp>
-#include <xayautil/uint256.hpp>
+#include <xgame/mainloop.hpp>
+#include <xutil/uint256.hpp>
 
 #include <jsonrpccpp/client/connectors/httpclient.h>
 
 #include <string>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -146,7 +146,7 @@ public:
   /**
    * Connects the blockchain "wallet" (defining the signature scheme and
    * the connector used for triggering automatic on-chain transactions).
-   * This can e.g. be based on a Xaya Core RPC.
+   * This can e.g. be based on a SpaceXpanse Core RPC.
    */
   void ConnectWallet (const SignatureVerifier& v, SignatureSigner& s,
                       TransactionSender& tx);
@@ -199,6 +199,6 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_DAEMON_HPP

@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,13 +6,13 @@
 
 #include "proto/metadata.pb.h"
 
-#include <xayautil/hash.hpp>
+#include <xutil/hash.hpp>
 
 #include <gtest/gtest.h>
 
 #include <glog/logging.h>
 
-namespace xaya
+namespace spacexpanse
 {
 namespace
 {
@@ -159,4 +159,4 @@ TEST_F (AdditionChannelTests, AutoMoves)
 }
 
 } // anonymous namespace
-} // namespace xaya
+} // namespace spacexpanse

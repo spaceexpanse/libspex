@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2019-2022 The Xaya developers
+# Copyright (C) 2019-2022 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -77,11 +77,11 @@ class ReorgTest (ShipsTest):
       self.generate (10)
 
       self.mainLogger.info ("Reorg to channel creation...")
-      self.rpc.xaya.invalidateblock (createBlk)
+      self.rpc.spacexpanse.invalidateblock (createBlk)
       state = self.getSyncedChannelState (daemons)
       self.assertEqual (state["existsonchain"], False)
-      self.rpc.xaya.reconsiderblock (createBlk)
-      self.rpc.xaya.invalidateblock (joinBlk)
+      self.rpc.spacexpanse.reconsiderblock (createBlk)
+      self.rpc.spacexpanse.invalidateblock (joinBlk)
       self.assertEqual (self.env.getChainTip ()[0], createBlk)
       state = self.getSyncedChannelState (daemons)
       self.assertEqual (state["existsonchain"], True)
@@ -120,7 +120,7 @@ class ReorgTest (ShipsTest):
       })
 
       self.mainLogger.info ("Restoring original state...")
-      self.rpc.xaya.reconsiderblock (joinBlk)
+      self.rpc.spacexpanse.reconsiderblock (joinBlk)
       state = self.getSyncedChannelState (daemons)
       self.assertEqual (state["current"]["meta"],
                         originalState["current"]["meta"])
@@ -156,7 +156,7 @@ class ReorgTest (ShipsTest):
       state = self.getSyncedChannelState (daemons)
       assert "dispute" not in state
 
-      self.rpc.xaya.invalidateblock (resolutionBlk)
+      self.rpc.spacexpanse.invalidateblock (resolutionBlk)
       state = foo.getCurrentState ()
       self.assertEqual (state["dispute"], {
         "whoseturn": 0,
@@ -191,7 +191,7 @@ class ReorgTest (ShipsTest):
 
       self.mainLogger.info ("Detaching a block and ending the game normally...")
       disputeTimeoutBlk, _ = self.env.getChainTip ()
-      self.rpc.xaya.invalidateblock (disputeTimeoutBlk)
+      self.rpc.spacexpanse.invalidateblock (disputeTimeoutBlk)
       state = self.getSyncedChannelState (daemons)
       self.assertEqual (state["existsonchain"], True)
 
@@ -217,7 +217,7 @@ class ReorgTest (ShipsTest):
 
       self.mainLogger.info ("Reorg and resending of loss declaration...")
       winnerStmtBlk, _ = self.env.getChainTip ()
-      self.rpc.xaya.invalidateblock (winnerStmtBlk)
+      self.rpc.spacexpanse.invalidateblock (winnerStmtBlk)
       state = self.getSyncedChannelState (daemons)
       self.assertEqual (state["current"]["state"]["parsed"]["phase"],
                         "finished")
@@ -240,7 +240,7 @@ class ReorgTest (ShipsTest):
       # to the mempool.  Verify that we send a new one.
       winnerStmtBlk, _ = self.env.getChainTip ()
       self.generate (10)
-      self.rpc.xaya.invalidateblock (winnerStmtBlk)
+      self.rpc.spacexpanse.invalidateblock (winnerStmtBlk)
       state = self.getSyncedChannelState (daemons)
       self.assertEqual (state["current"]["state"]["parsed"]["phase"],
                         "finished")

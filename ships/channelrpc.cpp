@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -138,7 +138,7 @@ ShipsChannelRpcServer::filedispute ()
   const bool hasWinner
       = (state != nullptr && state->GetState ().has_winner ());
 
-  const xaya::uint256 txid = hasWinner
+  const spacexpanse::uint256 txid = hasWinner
       ? cm->PutStateOnChain ()
       : cm->FileDispute ();
 
@@ -165,10 +165,10 @@ ShipsChannelRpcServer::ExtendStateJson (Json::Value&& state) const
 }
 
 void
-ShipsChannelRpcServer::ProcessLocalMove (xaya::ChannelManager& cm,
+ShipsChannelRpcServer::ProcessLocalMove (spacexpanse::ChannelManager& cm,
                                          const proto::BoardMove& mv)
 {
-  xaya::BoardMove serialised;
+  spacexpanse::BoardMove serialised;
   CHECK (mv.SerializeToString (&serialised));
   cm.ProcessLocalMove (serialised);
 }

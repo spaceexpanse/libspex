@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,11 +9,11 @@
 #include "schema.hpp"
 #include "stateproof.hpp"
 
-#include <xayautil/hash.hpp>
+#include <xutil/hash.hpp>
 
 #include <glog/logging.h>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /* ************************************************************************** */
@@ -148,7 +148,7 @@ const SignatureVerifier&
 ChannelGame::GetSignatureVerifier ()
 {
   if (verifier == nullptr)
-    verifier = std::make_unique<RpcSignatureVerifier> (GetXayaRpc ());
+    verifier = std::make_unique<RpcSignatureVerifier> (GetXRpc ());
 
   CHECK (verifier != nullptr);
   return *verifier;
@@ -252,4 +252,4 @@ UpdateMetadataReinit (const uint256& txid, proto::ChannelMetadata& meta)
 
 /* ************************************************************************** */
 
-} // namespace xaya
+} // namespace spacexpanse

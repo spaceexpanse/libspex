@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2018-2020 The Xaya developers
+# Copyright (C) 2018-2020 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -114,22 +114,22 @@ class WaitForChangeTest (MoverTest):
     pending.shouldBeRunning ()
 
     self.generate (1)
-    blocks.shouldBeDone (self.rpc.xaya.getbestblockhash ())
+    blocks.shouldBeDone (self.rpc.spacexpanse.getbestblockhash ())
     pending.shouldBeDone (self.rpc.game.getpendingstate ())
 
   def test_detach (self):
     self.mainLogger.info ("Block detaches...")
 
     self.generate (1)
-    blk = self.rpc.xaya.getbestblockhash ()
+    blk = self.rpc.spacexpanse.getbestblockhash ()
 
     blocks = self.getBlockChangeWaiter ()
     pending = self.getPendingChangeWaiter ()
     blocks.shouldBeRunning ()
     pending.shouldBeRunning ()
 
-    self.rpc.xaya.invalidateblock (blk)
-    blocks.shouldBeDone (self.rpc.xaya.getbestblockhash ())
+    self.rpc.spacexpanse.invalidateblock (blk)
+    blocks.shouldBeDone (self.rpc.spacexpanse.getbestblockhash ())
     pending.shouldBeDone (self.rpc.game.getpendingstate ())
 
   def test_move (self):
@@ -162,7 +162,7 @@ class WaitForChangeTest (MoverTest):
     pending.shouldBeRunning ()
 
     self.stopGameDaemon ()
-    blocks.shouldBeDone (self.rpc.xaya.getbestblockhash ())
+    blocks.shouldBeDone (self.rpc.spacexpanse.getbestblockhash ())
     pending.shouldBeDone ()
     self.startGameDaemon ()
 

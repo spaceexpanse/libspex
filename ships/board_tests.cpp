@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,10 +8,10 @@
 #include "proto/boardstate.pb.h"
 
 #include <gamechannel/proto/metadata.pb.h>
-#include <xayagame/testutils.hpp>
-#include <xayautil/base64.hpp>
-#include <xayautil/hash.hpp>
-#include <xayautil/uint256.hpp>
+#include <xgame/testutils.hpp>
+#include <xutil/base64.hpp>
+#include <xutil/hash.hpp>
+#include <xutil/uint256.hpp>
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/util/message_differencer.h>
@@ -58,9 +58,9 @@ TextMove (const std::string& str)
 std::string
 HashToString (const std::string& preimage)
 {
-  const xaya::uint256 value = xaya::SHA256::Hash (preimage);
+  const spacexpanse::uint256 value = spacexpanse::SHA256::Hash (preimage);
   const char* data = reinterpret_cast<const char*> (value.GetBlob ());
-  return std::string (data, xaya::uint256::NUM_BYTES);
+  return std::string (data, spacexpanse::uint256::NUM_BYTES);
 }
 
 /* Allow printing as text proto for logging.  */
@@ -85,14 +85,14 @@ protected:
 
   using Phase = ShipsBoardState::Phase;
 
-  const xaya::uint256 channelId = xaya::SHA256::Hash ("foo");
+  const spacexpanse::uint256 channelId = spacexpanse::SHA256::Hash ("foo");
 
   /**
    * The metadata used for testing.  This is set to a standard two-player
    * list by default, but may be modified by tests if they want to check what
    * happens in other situations (e.g. only one player in the channel yet).
    */
-  xaya::proto::ChannelMetadata meta;
+  spacexpanse::proto::ChannelMetadata meta;
 
   ShipsBoardRules rules;
 
@@ -191,7 +191,7 @@ TEST_F (SinglePlayerStateTests, IsValid)
 TEST_F (SinglePlayerStateTests, WhoseTurn)
 {
   EXPECT_EQ (ParseTextState ("turn: 1")->WhoseTurn (),
-             xaya::ParsedBoardState::NO_TURN);
+             spacexpanse::ParsedBoardState::NO_TURN);
 }
 
 TEST_F (SinglePlayerStateTests, TurnCount)
@@ -620,7 +620,7 @@ TEST_F (WhoseTurnTests, TurnSet)
 TEST_F (WhoseTurnTests, TurnNotSet)
 {
   EXPECT_EQ (ParseTextState ("winner: 1")->WhoseTurn (),
-             xaya::ParsedBoardState::NO_TURN);
+             spacexpanse::ParsedBoardState::NO_TURN);
 }
 
 /* ************************************************************************** */
@@ -908,8 +908,8 @@ TEST_F (SeedRevealTests, Valid)
           }
       )");
 
-      xaya::Random rnd;
-      rnd.Seed (xaya::SHA256::Hash (seed + "other seed"));
+      spacexpanse::Random rnd;
+      rnd.Seed (spacexpanse::SHA256::Hash (seed + "other seed"));
       expected.set_turn (rnd.Next<bool> () ? 1 : 0);
 
       ExpectNewState (state, mv, expected);
@@ -943,8 +943,8 @@ TEST_F (SeedRevealTests, MissingSeed1)
       }
   )");
 
-  xaya::Random rnd;
-  rnd.Seed (xaya::SHA256::Hash ("foo"));
+  spacexpanse::Random rnd;
+  rnd.Seed (spacexpanse::SHA256::Hash ("foo"));
   expected.set_turn (rnd.Next<bool> () ? 1 : 0);
 
   ExpectNewState (state, mv, expected);

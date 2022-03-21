@@ -1,4 +1,4 @@
-// Copyright (C) 2020-2021 The Xaya developers
+// Copyright (C) 2020-2021 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,7 +8,7 @@
 #include "pending.hpp"
 #include "rpcserver.hpp"
 
-#include "xayagame/defaultmain.hpp"
+#include "xgame/defaultmain.hpp"
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -19,12 +19,12 @@
 namespace
 {
 
-DEFINE_string (xaya_rpc_url, "",
-               "URL at which Xaya Core's JSON-RPC interface is available");
-DEFINE_int32 (xaya_rpc_protocol, 1,
-              "JSON-RPC version for connecting to Xaya Core");
-DEFINE_bool (xaya_rpc_wait, false,
-             "whether to wait on startup for Xaya Core to be available");
+DEFINE_string (x_rpc_url, "",
+               "URL at which SpaceXpanse Core's JSON-RPC interface is available");
+DEFINE_int32 (x_rpc_protocol, 1,
+              "JSON-RPC version for connecting to SpaceXpanse Core");
+DEFINE_bool (x_rpc_wait, false,
+             "whether to wait on startup for SpaceXpanse Core to be available");
 
 DEFINE_int32 (game_rpc_port, 0,
               "the port at which the GSP JSON-RPC server will be started"
@@ -43,7 +43,7 @@ DEFINE_string (datadir, "",
 DEFINE_bool (pending_moves, true,
              "whether or not pending moves should be tracked");
 
-class NFInstanceFactory : public xaya::CustomisedInstanceFactory
+class NFInstanceFactory : public spacexpanse::CustomisedInstanceFactory
 {
 
 private:
@@ -60,12 +60,12 @@ public:
     : logic(l)
   {}
 
-  std::unique_ptr<xaya::RpcServerInterface>
-  BuildRpcServer (xaya::Game& game,
+  std::unique_ptr<spacexpanse::RpcServerInterface>
+  BuildRpcServer (spacexpanse::Game& game,
                   jsonrpc::AbstractServerConnector& conn) override
   {
-    std::unique_ptr<xaya::RpcServerInterface> res;
-    res.reset (new xaya::WrappedRpcServer<nf::RpcServer> (game, logic, conn));
+    std::unique_ptr<spacexpanse::RpcServerInterface> res;
+    res.reset (new spacexpanse::WrappedRpcServer<nf::RpcServer> (game, logic, conn));
     return res;
   }
 
@@ -82,9 +82,9 @@ main (int argc, char** argv)
   gflags::SetVersionString (PACKAGE_VERSION);
   gflags::ParseCommandLineFlags (&argc, &argv, true);
 
-  if (FLAGS_xaya_rpc_url.empty ())
+  if (FLAGS_x_rpc_url.empty ())
     {
-      std::cerr << "Error: --xaya_rpc_url must be set" << std::endl;
+      std::cerr << "Error: --x_rpc_url must be set" << std::endl;
       return EXIT_FAILURE;
     }
   if (FLAGS_datadir.empty ())
@@ -93,13 +93,13 @@ main (int argc, char** argv)
       return EXIT_FAILURE;
     }
 
-  xaya::GameDaemonConfiguration config;
-  config.XayaRpcUrl = FLAGS_xaya_rpc_url;
-  config.XayaJsonRpcProtocol = FLAGS_xaya_rpc_protocol;
-  config.XayaRpcWait = FLAGS_xaya_rpc_wait;
+  spacexpanse::GameDaemonConfiguration config;
+  config.XRpcUrl = FLAGS_x_rpc_url;
+  config.XJsonRpcProtocol = FLAGS_x_rpc_protocol;
+  config.XRpcWait = FLAGS_x_rpc_wait;
   if (FLAGS_game_rpc_port != 0)
     {
-      config.GameRpcServer = xaya::RpcServerType::HTTP;
+      config.GameRpcServer = spacexpanse::RpcServerType::HTTP;
       config.GameRpcPort = FLAGS_game_rpc_port;
       config.GameRpcListenLocally = FLAGS_game_rpc_listen_locally;
     }
@@ -115,5 +115,5 @@ main (int argc, char** argv)
   if (FLAGS_pending_moves)
     config.PendingMoves = &pending;
 
-  return xaya::SQLiteMain (config, "nf", logic);
+  return spacexpanse::SQLiteMain (config, "nf", logic);
 }

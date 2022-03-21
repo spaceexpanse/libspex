@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2018-2020 The Xaya developers
+# Copyright (C) 2018-2020 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -22,7 +22,7 @@ class CatchingUpTest (MoverTest):
     # Disable tracking of the game, so it won't get notified about changes
     # we make and get out of sync.
     self.log.info ("Untracking g/mv")
-    self.rpc.xaya.trackedgames ("remove", "mv")
+    self.rpc.spacexpanse.trackedgames ("remove", "mv")
     self.move ("a", "k", 2)
     self.generate (1)
 
@@ -37,7 +37,7 @@ class CatchingUpTest (MoverTest):
     # Start to track the game again and mine another block.  This should make
     # the game catch up.
     self.log.info ("Tracking g/mv again")
-    self.rpc.xaya.trackedgames ("add", "mv")
+    self.rpc.spacexpanse.trackedgames ("add", "mv")
     self.generate (1)
     self.expectGameState ({"players": {
       "a": {"x": 0, "y": 2},

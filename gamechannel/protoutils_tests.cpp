@@ -1,4 +1,4 @@
-// Copyright (C) 2019 The Xaya developers
+// Copyright (C) 2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -12,7 +12,7 @@
 
 #include <gtest/gtest.h>
 
-namespace xaya
+namespace spacexpanse
 {
 namespace
 {
@@ -87,4 +87,4 @@ TEST_F (ProtoUtilsTests, StateProofRoundtrip)
 }
 
 } // anonymous namespace
-} // namespace xaya
+} // namespace spacexpanse

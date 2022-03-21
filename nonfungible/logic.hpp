@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,8 +7,8 @@
 
 #include "statejson.hpp"
 
-#include <xayagame/sqlitegame.hpp>
-#include <xayagame/sqlitestorage.hpp>
+#include <xgame/sqlitegame.hpp>
+#include <xgame/sqlitestorage.hpp>
 
 #include <json/json.h>
 
@@ -21,21 +21,21 @@ namespace nf
 /**
  * The game logic implementation for the non-fungible game-state processor.
  */
-class NonFungibleLogic : public xaya::SQLiteGame
+class NonFungibleLogic : public spacexpanse::SQLiteGame
 {
 
 protected:
 
-  void SetupSchema (xaya::SQLiteDatabase& db) override;
+  void SetupSchema (spacexpanse::SQLiteDatabase& db) override;
 
   void GetInitialStateBlock (unsigned& height,
                              std::string& hashHex) const override;
-  void InitialiseState (xaya::SQLiteDatabase& db) override;
+  void InitialiseState (spacexpanse::SQLiteDatabase& db) override;
 
-  void UpdateState (xaya::SQLiteDatabase& db,
+  void UpdateState (spacexpanse::SQLiteDatabase& db,
                     const Json::Value& blockData) override;
 
-  Json::Value GetStateAsJson (const xaya::SQLiteDatabase& db) override;
+  Json::Value GetStateAsJson (const spacexpanse::SQLiteDatabase& db) override;
 
 public:
 
@@ -56,7 +56,7 @@ public:
    * the provided extractor callback, which can then operate through a
    * StateJsonExtractor instance.
    */
-  Json::Value GetCustomStateData (xaya::Game& game, const StateCallback& cb);
+  Json::Value GetCustomStateData (spacexpanse::Game& game, const StateCallback& cb);
 
 };
 

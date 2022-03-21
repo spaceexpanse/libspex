@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,7 +6,7 @@
 
 #include <glog/logging.h>
 
-namespace xaya
+namespace spacexpanse
 {
 
 template <typename State>
@@ -22,4 +22,4 @@ template <typename State>
   return typedState;
 }
 
-} // namespace xaya
+} // namespace spacexpanse

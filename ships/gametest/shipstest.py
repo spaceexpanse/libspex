@@ -1,4 +1,4 @@
-# Copyright (C) 2019-2022 The Xaya developers
+# Copyright (C) 2019-2022 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -66,7 +66,7 @@ class ShipsTest (channeltest.TestCase):
     return super ().runChannelDaemon (playerName,
         channelid=channelId,
         address=address,
-        xaya_rpc_url=self.xayanode.rpcurl)
+        x_rpc_url=self.xnode.rpcurl)
 
   def getStateProof (self, cid, stateStr):
     """
@@ -83,7 +83,7 @@ class ShipsTest (channeltest.TestCase):
     stateBytes = state.SerializeToString ()
 
     res = stateproof_pb2.StateProof ()
-    signedData = signatures.createForChannel (self.rpc.xaya, GAME_ID, channel,
+    signedData = signatures.createForChannel (self.rpc.spacexpanse, GAME_ID, channel,
                                               "state", stateBytes)
     res.initial_state.CopyFrom (signedData)
 
@@ -121,7 +121,7 @@ class ShipsTest (channeltest.TestCase):
     # to avoid tests being flaky.
     time.sleep (1)
 
-    pending = self.rpc.xaya.name_pending ("p/" + name)
+    pending = self.rpc.spacexpanse.name_pending ("p/" + name)
     actualTypes = []
     for p in pending:
       val = json.loads (p["value"])
@@ -158,8 +158,8 @@ class ShipsTest (channeltest.TestCase):
     can be made temporarily.  This does not affect signing messages.
     """
 
-    outputs = self.rpc.xaya.listunspent ()
-    self.rpc.xaya.lockunspent (False, outputs)
+    outputs = self.rpc.spacexpanse.listunspent ()
+    self.rpc.spacexpanse.lockunspent (False, outputs)
 
   def unlockFunds (self):
     """
@@ -167,4 +167,4 @@ class ShipsTest (channeltest.TestCase):
     again successfully.
     """
 
-    self.rpc.xaya.lockunspent (True)
+    self.rpc.spacexpanse.lockunspent (True)

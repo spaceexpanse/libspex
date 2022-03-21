@@ -1,10 +1,10 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 syntax = "proto2";
 
-package xaya.proto;
+package spacexpanse.proto;
 
 /** A piece of data with signatures of channel participants.  */
 message SignedData
@@ -19,7 +19,7 @@ message SignedData
   /**
    * The signatures made on the data by channel participants.  Each signature
    * stores raw bytes based on the underlying message signing/verification
-   * provider used.  For instance, for signing based on Xaya Core's RPC
+   * provider used.  For instance, for signing based on SpaceXpanse Core's RPC
    * interface with signmessage/verifymessage, the data is the base64-decoded
    * signature string as raw binary.
    *

@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,12 +8,12 @@
 #include "proto/metadata.pb.h"
 #include "proto/signatures.pb.h"
 
-#include <xayautil/uint256.hpp>
+#include <xutil/uint256.hpp>
 
 #include <set>
 #include <string>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /* ************************************************************************** */
@@ -21,7 +21,7 @@ namespace xaya
 /**
  * General interface for a signature scheme, implementing verification
  * of signatures (with address recovery).  This can be implemented using
- * Xaya Core's verifymessage RPC method, via Ethereum message signing, or
+ * SpaceXpanse Core's verifymessage RPC method, via Ethereum message signing, or
  * in principle by any other custom scheme as well.
  */
 class SignatureVerifier
@@ -118,6 +118,6 @@ bool SignDataForParticipant (SignatureSigner& signer,
 
 /* ************************************************************************** */
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_SIGNATURES_HPP

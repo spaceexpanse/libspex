@@ -1,4 +1,4 @@
-# Copyright (C) 2019 The Xaya developers
+# Copyright (C) 2019 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -58,7 +58,7 @@ class PendingMovesTest (MoverTest):
     # Mine a block, which we will detach later and then reorg
     # back to the chain.  For now, this should clear the mempool.
     self.generate (1)
-    reorgBlock = self.rpc.xaya.getbestblockhash ()
+    reorgBlock = self.rpc.spacexpanse.getbestblockhash ()
     newState = self.getGameState ()
     self.assertEqual (newState, {"players": {
       "a": {"x": -1, "y": 1, "dir": "left", "steps": 2},
@@ -68,7 +68,7 @@ class PendingMovesTest (MoverTest):
     self.assertEqual (self.getPendingState (), {})
 
     # Detach the last two blocks.  This should put back the moves.
-    self.rpc.xaya.invalidateblock (reorgBlock)
+    self.rpc.spacexpanse.invalidateblock (reorgBlock)
     self.expectGameState (oldState)
     self.assertEqual (self.getPendingState (), oldPending)
 
@@ -80,7 +80,7 @@ class PendingMovesTest (MoverTest):
     # in theory fail with the two-socket mode, because the re-added moves
     # may be processed after attaching the new tip.  But it seems to work
     # fine for now.
-    self.rpc.xaya.reconsiderblock (reorgBlock)
+    self.rpc.spacexpanse.reconsiderblock (reorgBlock)
     self.expectGameState (newState)
     self.assertEqual (self.getPendingState (), {})
 

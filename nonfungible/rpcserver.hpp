@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,7 +8,7 @@
 #include "logic.hpp"
 #include "rpc-stubs/nfrpcserverstub.h"
 
-#include "xayagame/game.hpp"
+#include "xgame/game.hpp"
 
 #include <json/json.h>
 #include <jsonrpccpp/server.h>
@@ -27,14 +27,14 @@ class RpcServer : public NFRpcServerStub
 private:
 
   /** The underlying Game instance that manages everything.  */
-  xaya::Game& game;
+  spacexpanse::Game& game;
 
   /** The NF logic instance for the SQLite database.  */
   NonFungibleLogic& logic;
 
 public:
 
-  explicit RpcServer (xaya::Game& g, NonFungibleLogic& l,
+  explicit RpcServer (spacexpanse::Game& g, NonFungibleLogic& l,
                       jsonrpc::AbstractServerConnector& conn)
     : NFRpcServerStub(conn), game(g), logic(l)
   {}

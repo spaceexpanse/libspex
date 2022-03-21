@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2019 The Xaya developers
+// Copyright (C) 2018-2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,9 +19,9 @@ namespace
 
 using google::protobuf::TextFormat;
 using google::protobuf::util::MessageDifferencer;
-using xaya::Chain;
-using xaya::GameStateData;
-using xaya::UndoData;
+using spacexpanse::Chain;
+using spacexpanse::GameStateData;
+using spacexpanse::UndoData;
 
 /* ************************************************************************** */
 

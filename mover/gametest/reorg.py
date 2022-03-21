@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2018-2020 The Xaya developers
+# Copyright (C) 2018-2020 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -27,7 +27,7 @@ class ReorgTest (MoverTest):
     # that they won't be remined later.  This also means that we will naturally
     # reorg back to this chain later.
     self.generate (1)
-    blk = self.rpc.xaya.getbestblockhash ()
+    blk = self.rpc.spacexpanse.getbestblockhash ()
     consolidationTxs = []
     for _ in range (11):
       # We have to consolidate in steps to avoid errors because of a too large
@@ -44,14 +44,14 @@ class ReorgTest (MoverTest):
     }})
 
     # Invalidate the branch and create another one with different transactions.
-    self.rpc.xaya.invalidateblock (blk)
-    assert self.rpc.xaya.getrawmempool () == []
+    self.rpc.spacexpanse.invalidateblock (blk)
+    assert self.rpc.spacexpanse.getrawmempool () == []
     for txid in consolidationTxs:
       # We need to explicitly abandon transactions that involve the orphaned
       # block rewards.  Otherwise the funds won't be marked as available again
       # in the wallet.  See https://github.com/bitcoin/bitcoin/issues/14148.
-      self.rpc.xaya.abandontransaction (txid)
-    assert self.rpc.xaya.getbalance () > 0
+      self.rpc.spacexpanse.abandontransaction (txid)
+    assert self.rpc.spacexpanse.getbalance () > 0
     self.expectGameState ({"players": {
       "a": {"x": 0, "y": 1, "dir": "up", "steps": 4},
     }})
@@ -65,7 +65,7 @@ class ReorgTest (MoverTest):
     }})
 
     # Reorg back to the longer branch.
-    self.rpc.xaya.reconsiderblock (blk)
+    self.rpc.spacexpanse.reconsiderblock (blk)
     self.expectGameState ({"players": {
       "a": {"x": -1, "y": 5},
       "b": {"x": 1, "y": 0},
@@ -78,10 +78,10 @@ class ReorgTest (MoverTest):
     transactions cannot be remined after detaching a chain part.
     """
 
-    balance = self.rpc.xaya.getbalance ()
-    addr = self.rpc.xaya.getnewaddress ()
+    balance = self.rpc.spacexpanse.getbalance ()
+    addr = self.rpc.spacexpanse.getnewaddress ()
     self.log.info ("Sending all %.8f CHI to %s" % (balance, addr))
-    return self.rpc.xaya.sendtoaddress (addr, balance, "", "", True)
+    return self.rpc.spacexpanse.sendtoaddress (addr, balance, "", "", True)
 
 
 if __name__ == "__main__":

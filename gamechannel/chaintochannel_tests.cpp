@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,7 +11,7 @@
 
 #include "rpc-stubs/channelgsprpcserverstub.h"
 
-#include <xayautil/hash.hpp>
+#include <xutil/hash.hpp>
 
 #include <google/protobuf/text_format.h>
 
@@ -27,7 +27,7 @@
 
 using google::protobuf::TextFormat;
 
-namespace xaya
+namespace spacexpanse
 {
 namespace
 {
@@ -412,4 +412,4 @@ TEST_F (WaitForChangeLoopTests, TimeoutsGetRepeated)
 /* ************************************************************************** */
 
 } // anonymous namespace
-} // namespace xaya
+} // namespace spacexpanse

@@ -1,15 +1,15 @@
-# Copyright (C) 2019-2022 The Xaya developers
+# Copyright (C) 2019-2022 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 """
-Integration tests running channel daemons in addition to Xaya Core
+Integration tests running channel daemons in addition to SpaceXpanse Core
 on regtest and a GSP.
 """
 
 from . import rpcbroadcast
 
-from xayagametest.testcase import XayaGameTest
+from xgametest.testcase import XGameTest
 
 from contextlib import contextmanager
 import jsonrpclib
@@ -26,9 +26,9 @@ import time
 class Daemon ():
   """
   An instance of a game's channel daemon, connected to a regtest
-  Xaya Core and the game's GSP.
+  SpaceXpanse Core and the game's GSP.
 
-  This class is used for the Xayaships and game-channel integration tests,
+  This class is used for the Xships and game-channel integration tests,
   but other games can use it as well if their channel daemons:
 
   * Have the --playername and --rpc_port flags of ships-channel, and
@@ -101,7 +101,7 @@ class Daemon ():
   def getCurrentState (self):
     """
     Queries for the current state of the tracked channel.  This also queries
-    Xaya Core for the best block hash, and waits until the block known to
+    SpaceXpanse Core for the best block hash, and waits until the block known to
     the channel daemon matches it.  That way we can ensure that updates are
     propagated before doing any tests.
     """
@@ -122,7 +122,7 @@ class Daemon ():
       time.sleep (0.01)
 
 
-class TestCase (XayaGameTest):
+class TestCase (XGameTest):
   """
   Integration test case for channel games, which may include testing
   for channel daemons in addition to the GSP.
@@ -185,7 +185,7 @@ class TestCase (XayaGameTest):
     address in a channel.
     """
 
-    return self.rpc.xaya.getnewaddress ("", "legacy")
+    return self.rpc.spacexpanse.getnewaddress ("", "legacy")
 
   def getSyncedChannelState (self, daemons):
     """

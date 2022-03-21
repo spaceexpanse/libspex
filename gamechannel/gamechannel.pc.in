@@ -6,10 +6,10 @@ includedir=@includedir@
 Name: gamechannel
 Version: @PACKAGE_VERSION@
 
-Description: A library for Xaya games with game channels.
-URL: https://github.com/xaya/libxayagame
+Description: A library for SpaceXpanse games with game channels.
+URL: https://github.com/spacexpanse/libxgame
 
-Requires: @AX_PACKAGE_REQUIRES@ channelcore libxayagame libxayautil
+Requires: @AX_PACKAGE_REQUIRES@ channelcore libxgame libxutil
 Requires.private: @AX_PACKAGE_REQUIRES_PRIVATE@
 
 Cflags: -I${includedir}

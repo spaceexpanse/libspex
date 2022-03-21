@@ -1,0 +1,16 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: libxutil
+Version: @PACKAGE_VERSION@
+
+Description: A library of basic utilities for games on the SpaceXpanse platform.
+URL: https://github.com/spacexpanse/libxgame
+
+Requires: jsoncpp
+Requires.private: libglog openssl zlib
+
+Cflags: -I${includedir}
+Libs: -L${libdir} -lxutil

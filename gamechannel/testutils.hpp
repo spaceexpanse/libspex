@@ -1,4 +1,4 @@
-// Copyright (C) 2022 The Xaya developers
+// Copyright (C) 2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,7 +11,7 @@
 
 #include "proto/metadata.pb.h"
 
-#include <xayautil/uint256.hpp>
+#include <xutil/uint256.hpp>
 
 #include <gmock/gmock.h>
 
@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -158,6 +158,6 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_TESTUTILS_HPP

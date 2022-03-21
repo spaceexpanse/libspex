@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,18 +8,18 @@
 #include "movesender.hpp"
 #include "signatures.hpp"
 
-#include <xayagame/rpc-stubs/xayarpcclient.h>
-#include <xayagame/rpc-stubs/xayawalletrpcclient.h>
+#include <xgame/rpc-stubs/xrpcclient.h>
+#include <xgame/rpc-stubs/xwalletrpcclient.h>
 
 #include <string>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
- * An implementation of the verifier based on a Xaya RPC connection.
+ * An implementation of the verifier based on a SpaceXpanse RPC connection.
  *
- * This uses Xaya Core's signmessage/verifymessage scheme, but signatures
+ * This uses SpaceXpanse Core's signmessage/verifymessage scheme, but signatures
  * returned and passed in for verification are assumed to be already base64
  * decoded to raw bytes.
  */
@@ -29,11 +29,11 @@ class RpcSignatureVerifier : public SignatureVerifier
 private:
 
   /** The underlying RPC client for verification.  */
-  XayaRpcClient& rpc;
+  XRpcClient& rpc;
 
 public:
 
-  explicit RpcSignatureVerifier (XayaRpcClient& r)
+  explicit RpcSignatureVerifier (XRpcClient& r)
     : rpc(r)
   {}
 
@@ -43,7 +43,7 @@ public:
 };
 
 /**
- * An implementation of the signer based on a Xaya RPC connection.
+ * An implementation of the signer based on a SpaceXpanse RPC connection.
  */
 class RpcSignatureSigner : public SignatureSigner
 {
@@ -51,14 +51,14 @@ class RpcSignatureSigner : public SignatureSigner
 private:
 
   /** The underlying RPC wallet for signing.  */
-  XayaWalletRpcClient& wallet;
+  XWalletRpcClient& wallet;
 
   /** The address used for signing (must be in the wallet).  */
   const std::string address;
 
 public:
 
-  explicit RpcSignatureSigner (XayaWalletRpcClient& w, const std::string& addr);
+  explicit RpcSignatureSigner (XWalletRpcClient& w, const std::string& addr);
 
   std::string GetAddress () const override;
   std::string SignMessage (const std::string& msg) override;
@@ -66,7 +66,7 @@ public:
 };
 
 /**
- * A concrete implementation of TransactionSender that uses a Xaya Core RPC
+ * A concrete implementation of TransactionSender that uses a SpaceXpanse Core RPC
  * connection with name_update.
  */
 class RpcTransactionSender : public TransactionSender
@@ -74,15 +74,15 @@ class RpcTransactionSender : public TransactionSender
 
 private:
 
-  /** Xaya RPC connection to use.  */
-  XayaRpcClient& rpc;
+  /** SpaceXpanse RPC connection to use.  */
+  XRpcClient& rpc;
 
-  /** Xaya wallet RPC that we use.  */
-  XayaWalletRpcClient& wallet;
+  /** SpaceXpanse wallet RPC that we use.  */
+  XWalletRpcClient& wallet;
 
 public:
 
-  explicit RpcTransactionSender (XayaRpcClient& r, XayaWalletRpcClient& w)
+  explicit RpcTransactionSender (XRpcClient& r, XWalletRpcClient& w)
     : rpc(r), wallet(w)
   {}
 
@@ -92,6 +92,6 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_RPCWALLET_HPP

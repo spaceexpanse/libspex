@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +10,7 @@
 #include <gamechannel/database.hpp>
 #include <gamechannel/proto/stateproof.pb.h>
 #include <gamechannel/protoutils.hpp>
-#include <xayautil/base64.hpp>
+#include <xutil/base64.hpp>
 
 #include <glog/logging.h>
 
@@ -19,14 +19,14 @@ namespace ships
 
 /* ************************************************************************** */
 
-const xaya::BoardRules&
+const spacexpanse::BoardRules&
 ShipsLogic::GetBoardRules () const
 {
   return boardRules;
 }
 
 void
-ShipsLogic::SetupSchema (xaya::SQLiteDatabase& db)
+ShipsLogic::SetupSchema (spacexpanse::SQLiteDatabase& db)
 {
   SetupGameChannelsSchema (db);
   SetupShipsSchema (db);
@@ -35,28 +35,28 @@ ShipsLogic::SetupSchema (xaya::SQLiteDatabase& db)
 void
 ShipsLogic::GetInitialStateBlock (unsigned& height, std::string& hashHex) const
 {
-  const xaya::Chain chain = GetChain ();
+  const spacexpanse::Chain chain = GetChain ();
   switch (chain)
     {
-    case xaya::Chain::MAIN:
+    case spacexpanse::Chain::MAIN:
       height = 2'960'000;
       hashHex
           = "81c60638621eec528667941d954e044577f0125465ca2ba26347385d5e3aecdd";
       break;
 
-    case xaya::Chain::TEST:
+    case spacexpanse::Chain::TEST:
       height = 112'307;
       hashHex
           = "4a2497b5ce649747f9dffeab6fafd57aa928901f3b15537287359adf5ed6fb1a";
       break;
 
-    case xaya::Chain::REGTEST:
+    case spacexpanse::Chain::REGTEST:
       height = 0;
       hashHex
           = "6f750b36d22f1dc3d0a6e483af45301022646dfc3b3ba2187865f5a7d6d83ab1";
       break;
 
-    case xaya::Chain::GANACHE:
+    case spacexpanse::Chain::GANACHE:
       height = 0;
       /* Ganache does not have a fixed genesis block.  So leave the block
          hash open and just accept any at height 0.  */
@@ -69,7 +69,7 @@ ShipsLogic::GetInitialStateBlock (unsigned& height, std::string& hashHex) const
 }
 
 void
-ShipsLogic::InitialiseState (xaya::SQLiteDatabase& db)
+ShipsLogic::InitialiseState (spacexpanse::SQLiteDatabase& db)
 {
   /* The game simply starts with an empty database.  No stats for any names
      yet, and also no channels defined.  */
@@ -106,9 +106,9 @@ ParseCreateChannelMove (const Json::Value& obj, std::string& addr)
  * a valid one.
  */
 void
-HandleCreateChannel (xaya::SQLiteDatabase& db,
+HandleCreateChannel (spacexpanse::SQLiteDatabase& db,
                      const Json::Value& obj, const unsigned height,
-                     const std::string& name, const xaya::uint256& txid)
+                     const std::string& name, const spacexpanse::uint256& txid)
 {
   std::string addr;
   if (!ParseCreateChannelMove (obj, addr))
@@ -118,7 +118,7 @@ HandleCreateChannel (xaya::SQLiteDatabase& db,
       << "Creating channel with ID " << txid.ToHex ()
       << " for user " << name << " with address " << addr;
 
-  xaya::ChannelsTable tbl(db);
+  spacexpanse::ChannelsTable tbl(db);
 
   /* Verify that this is indeed a new instance and not an existing one.  That
      should never happen, assuming that txid's do not collide.  */
@@ -126,7 +126,7 @@ HandleCreateChannel (xaya::SQLiteDatabase& db,
   CHECK (h == nullptr) << "Already have channel with ID " << txid.ToHex ();
 
   h = tbl.CreateNew (txid);
-  xaya::proto::ChannelMetadata meta;
+  spacexpanse::proto::ChannelMetadata meta;
   auto* p = meta.add_participants ();
   p->set_name (name);
   p->set_address (addr);
@@ -146,8 +146,8 @@ HandleCreateChannel (xaya::SQLiteDatabase& db,
  * Helper method that tries to extract a channel ID in a move JSON object
  * and retrieve that channel.
  */
-xaya::ChannelsTable::Handle
-RetrieveChannelFromMove (const Json::Value& obj, xaya::ChannelsTable& tbl)
+spacexpanse::ChannelsTable::Handle
+RetrieveChannelFromMove (const Json::Value& obj, spacexpanse::ChannelsTable& tbl)
 {
   CHECK (obj.isObject ());
   const auto& idVal = obj["id"];
@@ -158,7 +158,7 @@ RetrieveChannelFromMove (const Json::Value& obj, xaya::ChannelsTable& tbl)
     }
   const std::string id = idVal.asString ();
 
-  xaya::uint256 channelId;
+  spacexpanse::uint256 channelId;
   if (!channelId.FromHex (id))
     {
       LOG (WARNING) << "Invalid uint256 channel ID: " << id;
@@ -180,9 +180,9 @@ RetrieveChannelFromMove (const Json::Value& obj, xaya::ChannelsTable& tbl)
  * valid, the handle is returned and the second player's signing address
  * is set.  Returns null if the move is not valid.
  */
-xaya::ChannelsTable::Handle
+spacexpanse::ChannelsTable::Handle
 ParseJoinChannelMove (const Json::Value& obj, const std::string& name,
-                      xaya::ChannelsTable& tbl, std::string& addr)
+                      spacexpanse::ChannelsTable& tbl, std::string& addr)
 {
   if (!obj.isObject ())
     return nullptr;
@@ -223,11 +223,11 @@ ParseJoinChannelMove (const Json::Value& obj, const std::string& name,
  * Tries to process a "join channel" move.
  */
 void
-HandleJoinChannel (xaya::SQLiteDatabase& db,
+HandleJoinChannel (spacexpanse::SQLiteDatabase& db,
                    const Json::Value& obj, const std::string& name,
-                   const xaya::uint256& txid)
+                   const spacexpanse::uint256& txid)
 {
-  xaya::ChannelsTable tbl(db);
+  spacexpanse::ChannelsTable tbl(db);
 
   std::string addr;
   auto h = ParseJoinChannelMove (obj, name, tbl, addr);
@@ -238,14 +238,14 @@ HandleJoinChannel (xaya::SQLiteDatabase& db,
       << "Adding " << name << " to channel " << h->GetId ().ToHex ()
       << " with address " << addr;
 
-  xaya::proto::ChannelMetadata newMeta = h->GetMetadata ();
-  xaya::UpdateMetadataReinit (txid, newMeta);
+  spacexpanse::proto::ChannelMetadata newMeta = h->GetMetadata ();
+  spacexpanse::UpdateMetadataReinit (txid, newMeta);
   auto* p = newMeta.add_participants ();
   p->set_name (name);
   p->set_address (addr);
   CHECK_EQ (newMeta.participants_size (), 2);
 
-  xaya::BoardState state;
+  spacexpanse::BoardState state;
   CHECK (InitialBoardState ().SerializeToString (&state));
   h->Reinitialise (newMeta, state);
 
@@ -265,7 +265,7 @@ HandleJoinChannel (xaya::SQLiteDatabase& db,
  */
 bool
 ParseAbortChannelMove (const Json::Value& obj, const std::string& name,
-                       xaya::ChannelsTable& tbl, xaya::uint256& id)
+                       spacexpanse::ChannelsTable& tbl, spacexpanse::uint256& id)
 {
   if (!obj.isObject ())
     return false;
@@ -306,8 +306,8 @@ ParseAbortChannelMove (const Json::Value& obj, const std::string& name,
  * game-channel library managed table, as well as from our extra-data one.
  */
 void
-DeleteChannelById (xaya::SQLiteDatabase& db, xaya::ChannelsTable& tbl,
-                   const xaya::uint256& id)
+DeleteChannelById (spacexpanse::SQLiteDatabase& db, spacexpanse::ChannelsTable& tbl,
+                   const spacexpanse::uint256& id)
 {
   tbl.DeleteById (id);
 
@@ -323,12 +323,12 @@ DeleteChannelById (xaya::SQLiteDatabase& db, xaya::ChannelsTable& tbl,
  * Tries to process an "abort channel" move.
  */
 void
-HandleAbortChannel (xaya::SQLiteDatabase& db,
+HandleAbortChannel (spacexpanse::SQLiteDatabase& db,
                     const Json::Value& obj, const std::string& name)
 {
-  xaya::ChannelsTable tbl(db);
+  spacexpanse::ChannelsTable tbl(db);
 
-  xaya::uint256 id;
+  spacexpanse::uint256 id;
   if (!ParseAbortChannelMove (obj, name, tbl, id))
     return;
 
@@ -347,7 +347,7 @@ template <typename T>
     return false;
   const std::string str = val.asString ();
 
-  if (!xaya::ProtoFromBase64 (val.asString (), res))
+  if (!spacexpanse::ProtoFromBase64 (val.asString (), res))
     {
       LOG (WARNING) << "Could not get proto from base64 string";
       return false;
@@ -359,7 +359,7 @@ template <typename T>
 } // anonymous namespace
 
 void
-ShipsLogic::HandleDeclareLoss (xaya::SQLiteDatabase& db,
+ShipsLogic::HandleDeclareLoss (spacexpanse::SQLiteDatabase& db,
                                const Json::Value& obj, const std::string& name)
 {
   if (!obj.isObject ())
@@ -371,12 +371,12 @@ ShipsLogic::HandleDeclareLoss (xaya::SQLiteDatabase& db,
       return;
     }
 
-  xaya::ChannelsTable tbl(db);
+  spacexpanse::ChannelsTable tbl(db);
   auto h = RetrieveChannelFromMove (obj, tbl);
   if (h == nullptr)
     return;
 
-  const xaya::uint256 id = h->GetId ();
+  const spacexpanse::uint256 id = h->GetId ();
   const auto& meta = h->GetMetadata ();
   if (meta.participants_size () != 2)
     {
@@ -389,7 +389,7 @@ ShipsLogic::HandleDeclareLoss (xaya::SQLiteDatabase& db,
   const auto reinitVal = obj["r"];
   std::string reinit;
   if (!reinitVal.isString ()
-        || !xaya::DecodeBase64 (reinitVal.asString (), reinit))
+        || !spacexpanse::DecodeBase64 (reinitVal.asString (), reinit))
     {
       LOG (WARNING) << "Invalid reinit value on declare loss: " << obj;
       return;
@@ -442,9 +442,9 @@ namespace
  * handle and sets the StateProof proto that was retrieved from the move.
  * Otherwise, a null handle is returned.
  */
-xaya::ChannelsTable::Handle
-ParseDisputeResolutionMove (const Json::Value& obj, xaya::ChannelsTable& tbl,
-                            xaya::proto::StateProof& proof)
+spacexpanse::ChannelsTable::Handle
+ParseDisputeResolutionMove (const Json::Value& obj, spacexpanse::ChannelsTable& tbl,
+                            spacexpanse::proto::StateProof& proof)
 {
   if (!obj.isObject ())
     return nullptr;
@@ -467,18 +467,18 @@ ParseDisputeResolutionMove (const Json::Value& obj, xaya::ChannelsTable& tbl,
 } // anonymous namespace
 
 void
-ShipsLogic::HandleDisputeResolution (xaya::SQLiteDatabase& db,
+ShipsLogic::HandleDisputeResolution (spacexpanse::SQLiteDatabase& db,
                                      const Json::Value& obj,
                                      const unsigned height,
                                      const bool isDispute)
 {
-  xaya::ChannelsTable tbl(db);
-  xaya::proto::StateProof proof;
+  spacexpanse::ChannelsTable tbl(db);
+  spacexpanse::proto::StateProof proof;
   auto h = ParseDisputeResolutionMove (obj, tbl, proof);
   if (h == nullptr)
     return;
 
-  const xaya::uint256 id = h->GetId ();
+  const spacexpanse::uint256 id = h->GetId ();
   const auto& meta = h->GetMetadata ();
   if (meta.participants_size () != 2)
     {
@@ -532,12 +532,12 @@ ShipsLogic::HandleDisputeResolution (xaya::SQLiteDatabase& db,
 }
 
 void
-ShipsLogic::ProcessExpiredDisputes (xaya::SQLiteDatabase& db,
+ShipsLogic::ProcessExpiredDisputes (spacexpanse::SQLiteDatabase& db,
                                     const unsigned height)
 {
   LOG (INFO) << "Processing expired disputes for height " << height << "...";
 
-  xaya::ChannelsTable tbl(db);
+  spacexpanse::ChannelsTable tbl(db);
   auto stmt = tbl.QueryForDisputeHeight (height - DISPUTE_BLOCKS);
   while (stmt.Step ())
     {
@@ -555,7 +555,7 @@ ShipsLogic::ProcessExpiredDisputes (xaya::SQLiteDatabase& db,
           << "Invalid on-chain state for disputed channel " << id.ToHex ()
           << ": " << h->GetLatestState ();
       const int loser = state->WhoseTurn ();
-      CHECK_NE (loser, xaya::ParsedBoardState::NO_TURN);
+      CHECK_NE (loser, spacexpanse::ParsedBoardState::NO_TURN);
       CHECK_GE (loser, 0);
       CHECK_LE (loser, 1);
       const int winner = 1 - loser;
@@ -573,8 +573,8 @@ ShipsLogic::ProcessExpiredDisputes (xaya::SQLiteDatabase& db,
 }
 
 void
-ShipsLogic::UpdateStats (xaya::SQLiteDatabase& db,
-                         const xaya::proto::ChannelMetadata& meta,
+ShipsLogic::UpdateStats (spacexpanse::SQLiteDatabase& db,
+                         const spacexpanse::proto::ChannelMetadata& meta,
                          const int winner)
 {
   CHECK_GE (winner, 0);
@@ -618,7 +618,7 @@ namespace
  * for a timeout number of blocks.
  */
 void
-TimeOutChannels (xaya::SQLiteDatabase& db, const unsigned height)
+TimeOutChannels (spacexpanse::SQLiteDatabase& db, const unsigned height)
 {
   /* Make sure we don't underflow for the first couple of blocks, particularly
      on regtest.  */
@@ -633,10 +633,10 @@ TimeOutChannels (xaya::SQLiteDatabase& db, const unsigned height)
   stmt.Bind (1, height - CHANNEL_TIMEOUT_BLOCKS);
 
   unsigned num = 0;
-  xaya::ChannelsTable tbl(db);
+  spacexpanse::ChannelsTable tbl(db);
   while (stmt.Step ())
     {
-      const auto id = stmt.Get<xaya::uint256> (0);
+      const auto id = stmt.Get<spacexpanse::uint256> (0);
       CHECK_EQ (stmt.Get<int> (1), height - CHANNEL_TIMEOUT_BLOCKS);
       CHECK_EQ (stmt.Get<int> (2), 1);
       DeleteChannelById (db, tbl, id);
@@ -650,7 +650,7 @@ TimeOutChannels (xaya::SQLiteDatabase& db, const unsigned height)
 } // anonymous namespace
 
 void
-ShipsLogic::UpdateState (xaya::SQLiteDatabase& db, const Json::Value& blockData)
+ShipsLogic::UpdateState (spacexpanse::SQLiteDatabase& db, const Json::Value& blockData)
 {
   const auto& blk = blockData["block"];
   CHECK (blk.isObject ());
@@ -671,7 +671,7 @@ ShipsLogic::UpdateState (xaya::SQLiteDatabase& db, const Json::Value& blockData)
 
       const auto& txidVal = mv["txid"];
       CHECK (txidVal.isString ());
-      xaya::uint256 txid;
+      spacexpanse::uint256 txid;
       CHECK (txid.FromHex (txidVal.asString ()));
 
       const auto& data = mv["move"];
@@ -706,7 +706,7 @@ ShipsLogic::UpdateState (xaya::SQLiteDatabase& db, const Json::Value& blockData)
 }
 
 Json::Value
-ShipsLogic::GetStateAsJson (const xaya::SQLiteDatabase& db)
+ShipsLogic::GetStateAsJson (const spacexpanse::SQLiteDatabase& db)
 {
   GameStateJson gsj(db, boardRules);
   return gsj.GetFullJson ();
@@ -725,7 +725,7 @@ ShipsPending::ClearShips ()
 void
 ShipsPending::HandleCreateChannel (const Json::Value& obj,
                                    const std::string& name,
-                                   const xaya::uint256& txid)
+                                   const spacexpanse::uint256& txid)
 {
   std::string addr;
   if (!ParseCreateChannelMove (obj, addr))
@@ -743,11 +743,11 @@ ShipsPending::HandleCreateChannel (const Json::Value& obj,
 }
 
 void
-ShipsPending::HandleJoinChannel (xaya::SQLiteDatabase& db,
+ShipsPending::HandleJoinChannel (spacexpanse::SQLiteDatabase& db,
                                  const Json::Value& obj,
                                  const std::string& name)
 {
-  xaya::ChannelsTable tbl(db);
+  spacexpanse::ChannelsTable tbl(db);
 
   std::string addr;
   auto h = ParseJoinChannelMove (obj, name, tbl, addr);
@@ -767,13 +767,13 @@ ShipsPending::HandleJoinChannel (xaya::SQLiteDatabase& db,
 }
 
 void
-ShipsPending::HandleAbortChannel (xaya::SQLiteDatabase& db,
+ShipsPending::HandleAbortChannel (spacexpanse::SQLiteDatabase& db,
                                   const Json::Value& obj,
                                   const std::string& name)
 {
-  xaya::ChannelsTable tbl(db);
+  spacexpanse::ChannelsTable tbl(db);
 
-  xaya::uint256 id;
+  spacexpanse::uint256 id;
   if (!ParseAbortChannelMove (obj, name, tbl, id))
     return;
 
@@ -785,11 +785,11 @@ ShipsPending::HandleAbortChannel (xaya::SQLiteDatabase& db,
 }
 
 void
-ShipsPending::HandleDisputeResolution (xaya::SQLiteDatabase& db,
+ShipsPending::HandleDisputeResolution (spacexpanse::SQLiteDatabase& db,
                                        const Json::Value& obj)
 {
-  xaya::ChannelsTable tbl(db);
-  xaya::proto::StateProof proof;
+  spacexpanse::ChannelsTable tbl(db);
+  spacexpanse::proto::StateProof proof;
   auto h = ParseDisputeResolutionMove (obj, tbl, proof);
   if (h == nullptr)
     return;
@@ -801,7 +801,7 @@ ShipsPending::HandleDisputeResolution (xaya::SQLiteDatabase& db,
 }
 
 void
-ShipsPending::AddPendingMoveUnsafe (const xaya::SQLiteDatabase& db,
+ShipsPending::AddPendingMoveUnsafe (const spacexpanse::SQLiteDatabase& db,
                                     const Json::Value& mv)
 {
   CHECK (mv.isObject ()) << "Not an object: " << mv;
@@ -812,7 +812,7 @@ ShipsPending::AddPendingMoveUnsafe (const xaya::SQLiteDatabase& db,
 
   const auto& txidVal = mv["txid"];
   CHECK (txidVal.isString ());
-  xaya::uint256 txid;
+  spacexpanse::uint256 txid;
   CHECK (txid.FromHex (txidVal.asString ()));
 
   const auto& data = mv["move"];
@@ -835,7 +835,7 @@ ShipsPending::AddPendingMoveUnsafe (const xaya::SQLiteDatabase& db,
      processing.  Even if a move is actually invalid, we can still apply
      its pending StateProof in case it is valid.  */
 
-  auto& mutableDb = const_cast<xaya::SQLiteDatabase&> (db);
+  auto& mutableDb = const_cast<spacexpanse::SQLiteDatabase&> (db);
   HandleCreateChannel (data["c"], name, txid);
   HandleJoinChannel (mutableDb, data["j"], name);
   HandleAbortChannel (mutableDb, data["a"], name);

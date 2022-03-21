@@ -1,0 +1,16 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: @PACKAGE_NAME@
+Version: @PACKAGE_VERSION@
+
+Description: A library for development of game backends on the SpaceXpanse platform.
+URL: https://github.com/spacexpanse/libxgame
+
+Requires: @AX_PACKAGE_REQUIRES@ libxutil
+Requires.private: @AX_PACKAGE_REQUIRES_PRIVATE@
+
+Cflags: -I${includedir}
+Libs: -L${libdir} -lxgame

@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,9 +8,9 @@
 #include "grid.hpp"
 
 #include <gamechannel/protoversion.hpp>
-#include <xayautil/hash.hpp>
-#include <xayautil/random.hpp>
-#include <xayautil/uint256.hpp>
+#include <xutil/hash.hpp>
+#include <xutil/random.hpp>
+#include <xutil/uint256.hpp>
 
 #include <glog/logging.h>
 
@@ -29,9 +29,9 @@ namespace
  * hash simply mismatches.
  */
 bool
-CheckHashValue (const xaya::uint256& actual, const std::string& expected)
+CheckHashValue (const spacexpanse::uint256& actual, const std::string& expected)
 {
-  if (expected.size () != xaya::uint256::NUM_BYTES)
+  if (expected.size () != spacexpanse::uint256::NUM_BYTES)
     {
       LOG (WARNING) << "Committed hash has wrong size: " << expected.size ();
       return false;
@@ -258,10 +258,10 @@ int
 ShipsBoardState::WhoseTurn () const
 {
   if (GetMetadata ().participants_size () == 1)
-    return xaya::ParsedBoardState::NO_TURN;
+    return spacexpanse::ParsedBoardState::NO_TURN;
 
   if (!GetState ().has_turn ())
-    return xaya::ParsedBoardState::NO_TURN;
+    return spacexpanse::ParsedBoardState::NO_TURN;
 
   const int res = GetState ().turn ();
   CHECK_GE (res, 0);
@@ -334,7 +334,7 @@ ShipsBoardState::ApplyPositionCommitment (
     const proto::PositionCommitmentMove& mv, const Phase phase,
     proto::BoardState& newState)
 {
-  if (mv.position_hash ().size () != xaya::uint256::NUM_BYTES)
+  if (mv.position_hash ().size () != spacexpanse::uint256::NUM_BYTES)
     {
       LOG (WARNING) << "position_hash has wrong size";
       return false;
@@ -343,7 +343,7 @@ ShipsBoardState::ApplyPositionCommitment (
   switch (phase)
     {
     case Phase::FIRST_COMMITMENT:
-      if (mv.seed_hash ().size () != xaya::uint256::NUM_BYTES)
+      if (mv.seed_hash ().size () != spacexpanse::uint256::NUM_BYTES)
         {
           LOG (WARNING) << "seed_hash has wrong size";
           return false;
@@ -366,7 +366,7 @@ ShipsBoardState::ApplyPositionCommitment (
           LOG (WARNING) << "Second commitment has seed hash";
           return false;
         }
-      if (mv.seed ().size () > xaya::uint256::NUM_BYTES)
+      if (mv.seed ().size () > spacexpanse::uint256::NUM_BYTES)
         {
           LOG (WARNING) << "seed is too large: " << mv.seed ().size ();
           return false;
@@ -398,12 +398,12 @@ ShipsBoardState::ApplySeedReveal (const proto::SeedRevealMove& mv,
       return false;
     }
 
-  if (mv.seed ().size () > xaya::uint256::NUM_BYTES)
+  if (mv.seed ().size () > spacexpanse::uint256::NUM_BYTES)
     {
       LOG (WARNING) << "seed is too large: " << mv.seed ().size ();
       return false;
     }
-  if (!CheckHashValue (xaya::SHA256::Hash (mv.seed ()),
+  if (!CheckHashValue (spacexpanse::SHA256::Hash (mv.seed ()),
                        newState.seed_hash_0 ()))
     {
       LOG (WARNING) << "seed does not match committed hash";
@@ -412,9 +412,9 @@ ShipsBoardState::ApplySeedReveal (const proto::SeedRevealMove& mv,
 
   /* The starting player is determined by computing a single random bit,
      seeded from the hash of both seed strings together.  */
-  xaya::SHA256 hasher;
+  spacexpanse::SHA256 hasher;
   hasher << mv.seed () << newState.seed_1 ();
-  xaya::Random rnd;
+  spacexpanse::Random rnd;
   rnd.Seed (hasher.Finalise ());
   newState.set_turn (rnd.Next<bool> () ? 1 : 0);
 
@@ -564,7 +564,7 @@ ShipsBoardState::ApplyPositionReveal (const proto::PositionRevealMove& mv,
       LOG (WARNING) << "Position reveal has no position data";
       return false;
     }
-  if (mv.salt ().size () > xaya::uint256::NUM_BYTES)
+  if (mv.salt ().size () > spacexpanse::uint256::NUM_BYTES)
     {
       LOG (WARNING)
           << "Position reveal has invalid salt size: " << mv.salt ().size ();
@@ -575,7 +575,7 @@ ShipsBoardState::ApplyPositionReveal (const proto::PositionRevealMove& mv,
 
   /* If the position does not match the committed hash, then the move is
      outright invalid.  */
-  xaya::SHA256 hasher;
+  spacexpanse::SHA256 hasher;
   hasher << g.Blob () << mv.salt ();
   if (!CheckHashValue (hasher.Finalise (),
                        newState.position_hashes (newState.turn ())))
@@ -678,7 +678,7 @@ ShipsBoardState::ApplyMoveProto (const proto::BoardMove& mv,
   newState = pb;
 
   const int turn = WhoseTurn ();
-  CHECK_NE (turn, xaya::ParsedBoardState::NO_TURN);
+  CHECK_NE (turn, spacexpanse::ParsedBoardState::NO_TURN);
 
   const auto phase = GetPhase ();
   switch (mv.move_case ())
@@ -709,10 +709,10 @@ ShipsBoardState::ApplyMoveProto (const proto::BoardMove& mv,
   return false;
 }
 
-xaya::ChannelProtoVersion
-ShipsBoardRules::GetProtoVersion (const xaya::proto::ChannelMetadata& m) const
+spacexpanse::ChannelProtoVersion
+ShipsBoardRules::GetProtoVersion (const spacexpanse::proto::ChannelMetadata& m) const
 {
-  return xaya::ChannelProtoVersion::ORIGINAL;
+  return spacexpanse::ChannelProtoVersion::ORIGINAL;
 }
 
 proto::BoardState

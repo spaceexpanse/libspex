@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,7 +7,7 @@
 
 #include "assets.hpp"
 
-#include <xayagame/sqlitestorage.hpp>
+#include <xgame/sqlitestorage.hpp>
 
 #include <json/json.h>
 
@@ -28,11 +28,11 @@ class StateJsonExtractor
 private:
 
   /** The underlying database.  */
-  const xaya::SQLiteDatabase& db;
+  const spacexpanse::SQLiteDatabase& db;
 
 public:
 
-  explicit StateJsonExtractor (const xaya::SQLiteDatabase& d)
+  explicit StateJsonExtractor (const spacexpanse::SQLiteDatabase& d)
     : db(d)
   {}
 

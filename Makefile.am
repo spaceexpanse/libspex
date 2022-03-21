@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS} -Im4
 
 SUBDIRS = \
-  xayautil xayagame xayagametest websocket \
+  xutil xgame xgametest websocket \
   mover nonfungible gamechannel ships

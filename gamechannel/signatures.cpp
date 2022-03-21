@@ -1,17 +1,17 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "signatures.hpp"
 
-#include <xayautil/base64.hpp>
-#include <xayautil/hash.hpp>
+#include <xutil/base64.hpp>
+#include <xutil/hash.hpp>
 
 #include <glog/logging.h>
 
 #include <sstream>
 
-namespace xaya
+namespace spacexpanse
 {
 
 std::string
@@ -89,4 +89,4 @@ SignDataForParticipant (SignatureSigner& signer,
   return true;
 }
 
-} // namespace xaya
+} // namespace spacexpanse

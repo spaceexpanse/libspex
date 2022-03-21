@@ -1,4 +1,4 @@
-// Copyright (C) 2019 The Xaya developers
+// Copyright (C) 2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -23,7 +23,7 @@ template <typename Proto>
 template <typename Proto>
   bool ProtoFromBase64 (const std::string& str, Proto& msg);
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #include "protoutils.tpp"
 

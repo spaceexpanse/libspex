@@ -7,9 +7,9 @@ Name: channelcore
 Version: @PACKAGE_VERSION@
 
 Description: Core library for any game-channel applications.
-URL: https://github.com/xaya/libxayagame
+URL: https://github.com/spacexpanse/libxgame
 
-Requires: jsoncpp libglog protobuf ethutils libxayautil
+Requires: jsoncpp libglog protobuf ethutils libxutil
 
 Cflags: -I${includedir}
 Libs: -L${libdir} -lchannelcore

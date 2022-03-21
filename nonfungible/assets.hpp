@@ -1,11 +1,11 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef NONFUNGIBLE_ASSETS_HPP
 #define NONFUNGIBLE_ASSETS_HPP
 
-#include "xayagame/sqlitestorage.hpp"
+#include "xgame/sqlitestorage.hpp"
 
 #include <json/json.h>
 
@@ -66,7 +66,7 @@ public:
   /**
    * Binds an asset to two parameters in the SQLite statement.
    */
-  void BindToParams (xaya::SQLiteDatabase::Statement& stmt,
+  void BindToParams (spacexpanse::SQLiteDatabase::Statement& stmt,
                      int indMinter, int indName) const;
 
   /**
@@ -77,7 +77,7 @@ public:
   /**
    * Extracts an Asset value from a database result.
    */
-  static Asset FromColumns (const xaya::SQLiteDatabase::Statement& stmt,
+  static Asset FromColumns (const spacexpanse::SQLiteDatabase::Statement& stmt,
                             int indMinter, int indName);
 
   /**

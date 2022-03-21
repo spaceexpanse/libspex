@@ -1,10 +1,10 @@
-// Copyright (C) 2022 The Xaya developers
+// Copyright (C) 2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "testutils.hpp"
 
-#include <xayautil/hash.hpp>
+#include <xutil/hash.hpp>
 
 #include <gmock/gmock.h>
 
@@ -12,7 +12,7 @@
 
 #include <sstream>
 
-namespace xaya
+namespace spacexpanse
 {
 
 using testing::_;
@@ -108,4 +108,4 @@ MockSignatureVerifier::ExpectOne (const std::string& gameId,
   EXPECT_CALL (*this, RecoverSigner (hashed, sgn)).WillOnce (Return (addr));
 }
 
-} // namespace xaya
+} // namespace spacexpanse

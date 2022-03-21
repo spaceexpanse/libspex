@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,7 +8,7 @@
 #include "assets.hpp"
 #include "moveparser.hpp"
 
-#include <xayagame/sqlitestorage.hpp>
+#include <xgame/sqlitestorage.hpp>
 
 #include <json/json.h>
 
@@ -36,7 +36,7 @@ protected:
   /**
    * Returns the underlying database instance as mutable.
    */
-  xaya::SQLiteDatabase& MutableDb ();
+  spacexpanse::SQLiteDatabase& MutableDb ();
 
   void ProcessMint (const Asset& a, Amount supply,
                     const std::string* data) override;
@@ -50,7 +50,7 @@ protected:
 
 public:
 
-  explicit MoveProcessor (xaya::SQLiteDatabase& d)
+  explicit MoveProcessor (spacexpanse::SQLiteDatabase& d)
     : MoveParser(d)
   {}
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (C) 2018-2020 The Xaya developers
+# Copyright (C) 2018-2020 The XAYA developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -44,18 +44,18 @@ class PruningTest (MoverTest):
     self.setPruning (1)
 
     txid = self.move ("a", "j", 1)
-    fullTx = self.rpc.xaya.gettransaction (txid)["hex"]
+    fullTx = self.rpc.spacexpanse.gettransaction (txid)["hex"]
     self.generate (1)
     self.expectGameState ({"players": {
       "a": {"x": 1, "y": 0},
       "b": {"x": -1, "y": 1},
     }})
-    blk = self.rpc.xaya.getbestblockhash ()
+    blk = self.rpc.spacexpanse.getbestblockhash ()
 
-    self.rpc.xaya.invalidateblock (blk)
+    self.rpc.spacexpanse.invalidateblock (blk)
     # Ensure that the move of a is in the mempool again.
-    self.rpc.xaya.sendrawtransaction (fullTx)
-    self.assertEqual (self.rpc.xaya.getrawmempool (), [txid])
+    self.rpc.spacexpanse.sendrawtransaction (fullTx)
+    self.assertEqual (self.rpc.spacexpanse.getrawmempool (), [txid])
     self.move ("b", "n", 1)
     self.generate (1)
     self.expectGameState ({"players": {
@@ -71,13 +71,13 @@ class PruningTest (MoverTest):
     # to ensure things work as expected.
     self.setPruning (1)
 
-    blk = self.rpc.xaya.getbestblockhash ()
+    blk = self.rpc.spacexpanse.getbestblockhash ()
     self.generate (1)
     self.expectGameState ({"players": {
       "a": {"x": 1, "y": 0},
       "b": {"x": 0, "y": 0},
     }})
-    self.rpc.xaya.invalidateblock (blk)
+    self.rpc.spacexpanse.invalidateblock (blk)
     self.syncGame ()
 
     self.stopGameDaemon ()

@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -22,7 +22,7 @@
    macro here, but it works and is for now the simplest solution.  */
 #undef SendMessage
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -87,6 +87,6 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_BROADCAST_HPP

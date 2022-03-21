@@ -35,7 +35,7 @@ libchannelcore_la_CXXFLAGS = \
   -I$(top_srcdir) \
   $(JSONCPP_CFLAGS) $(ETHUTILS_CFLAGS) $(GLOG_CFLAGS) $(PROTOBUF_CFLAGS)
 libchannelcore_la_LIBADD = \
-  $(top_builddir)/xayautil/libxayautil.la \
+  $(top_builddir)/xutil/libxutil.la \
   $(JSONCPP_LIBS) $(ETHUTILS_LIBS) $(GLOG_LIBS) $(PROTOBUF_LIBS)
 libchannelcore_la_SOURCES = \
   boardrules.cpp \
@@ -71,8 +71,8 @@ libgamechannel_la_CXXFLAGS = \
   $(GLOG_CFLAGS) $(SQLITE3_CFLAGS) $(PROTOBUF_CFLAGS)
 libgamechannel_la_LIBADD = \
   $(builddir)/libchannelcore.la \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(JSONCPP_LIBS) $(JSONRPCCLIENT_LIBS) $(JSONRPCSERVER_LIBS) \
   $(GLOG_LIBS) $(SQLITE3_LIBS) $(PROTOBUF_LIBS)
 libgamechannel_la_SOURCES = \
@@ -128,7 +128,7 @@ libtestutils_la_CXXFLAGS = \
 libtestutils_la_LIBADD = \
   $(builddir)/libgamechannel.la \
   $(builddir)/libchannelcore.la \
-  $(top_builddir)/xayautil/libxayautil.la \
+  $(top_builddir)/xutil/libxutil.la \
   $(GLOG_LIBS) $(GTEST_LIBS)
 libtestutils_la_SOURCES = \
   testutils.cpp
@@ -143,9 +143,9 @@ tests_LDADD = \
   $(builddir)/libtestutils.la \
   $(builddir)/libgamechannel.la \
   $(builddir)/libchannelcore.la \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
-  $(top_builddir)/xayagame/libtestutils.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
+  $(top_builddir)/xgame/libtestutils.la \
   $(JSONCPP_LIBS) $(JSONRPCCLIENT_LIBS) $(JSONRPCSERVER_LIBS) \
   $(GLOG_LIBS) $(GTEST_LIBS) $(SQLITE3_LIBS) $(PROTOBUF_LIBS)
 tests_SOURCES = \
@@ -185,8 +185,8 @@ test_rpcbroadcast_CXXFLAGS = \
 test_rpcbroadcast_LDADD = \
   $(builddir)/libgamechannel.la \
   $(builddir)/libchannelcore.la \
-  $(top_builddir)/xayautil/libxayautil.la \
-  $(top_builddir)/xayagame/libxayagame.la \
+  $(top_builddir)/xutil/libxutil.la \
+  $(top_builddir)/xgame/libxgame.la \
   $(JSONCPP_LIBS) $(JSONRPCCLIENT_LIBS) $(JSONRPCSERVER_LIBS) \
   $(GLOG_LIBS) $(GFLAGS_LIBS) $(PROTOBUF_LIBS)
 test_rpcbroadcast_SOURCES = test_rpcbroadcast.cpp

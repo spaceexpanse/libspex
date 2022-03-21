@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2020 The Xaya developers
+// Copyright (C) 2019-2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,7 +8,7 @@
 #include "testutils.hpp"
 
 #include <gamechannel/protoutils.hpp>
-#include <xayautil/hash.hpp>
+#include <xutil/hash.hpp>
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/util/message_differencer.h>
@@ -43,7 +43,7 @@ class GameStateJsonTests : public InMemoryLogicFixture
 
 protected:
 
-  xaya::ChannelsTable tbl;
+  spacexpanse::ChannelsTable tbl;
   GameStateJson gsj;
 
   GameStateJsonTests ()
@@ -73,9 +73,9 @@ TEST_F (GameStateJsonTests, GameStats)
 
 TEST_F (GameStateJsonTests, OneParticipantChannel)
 {
-  const auto id = xaya::SHA256::Hash ("channel");
+  const auto id = spacexpanse::SHA256::Hash ("channel");
   auto h = tbl.CreateNew (id);
-  xaya::proto::ChannelMetadata meta;
+  spacexpanse::proto::ChannelMetadata meta;
   CHECK (TextFormat::ParseFromString (R"(
     participants:
       {
@@ -131,9 +131,9 @@ TEST_F (GameStateJsonTests, OneParticipantChannel)
 
 TEST_F (GameStateJsonTests, TwoParticipantChannel)
 {
-  const auto id = xaya::SHA256::Hash ("channel");
+  const auto id = spacexpanse::SHA256::Hash ("channel");
   auto h = tbl.CreateNew (id);
-  xaya::proto::ChannelMetadata meta;
+  spacexpanse::proto::ChannelMetadata meta;
   CHECK (TextFormat::ParseFromString (R"(
     participants:
       {
@@ -165,7 +165,7 @@ TEST_F (GameStateJsonTests, TwoParticipantChannel)
   EXPECT_EQ (stateJson["parsed"]["phase"].asString (), "first commitment");
 
   proto::BoardState stateFromJson;
-  ASSERT_TRUE (xaya::ProtoFromBase64 (stateJson["base64"].asString (),
+  ASSERT_TRUE (spacexpanse::ProtoFromBase64 (stateJson["base64"].asString (),
                                       stateFromJson));
   EXPECT_TRUE (MessageDifferencer::Equals (state, stateFromJson));
 }

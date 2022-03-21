@@ -1,4 +1,4 @@
-// Copyright (C) 2019 The Xaya developers
+// Copyright (C) 2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +10,7 @@
 
 #include <google/protobuf/message.h>
 
-namespace xaya
+namespace spacexpanse
 {
 
 class BoardRules;
@@ -39,7 +39,7 @@ enum class ChannelProtoVersion
 
   /**
    * The original version of SignedData and StateProofs, as first released
-   * in the game-channel framework and the Xayaships tech demo.
+   * in the game-channel framework and the Xships tech demo.
    */
   ORIGINAL,
 
@@ -72,6 +72,6 @@ template <typename Proto>
                             const proto::ChannelMetadata& meta,
                             const Proto& msg);
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_PROTOVERSION_HPP

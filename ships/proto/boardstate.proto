@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2021 The Xaya developers
+// Copyright (C) 2019-2021 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -23,7 +23,7 @@ message KnownShips
 }
 
 /**
- * The full board state of a game channel of Xayaships.  The generic board state
+ * The full board state of a game channel of Xships.  The generic board state
  * for libgamechannel (std::string) is the serialised form of this message.
  *
  * This state applies only to channels that already have both participants.

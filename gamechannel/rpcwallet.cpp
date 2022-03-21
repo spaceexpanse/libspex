@@ -1,15 +1,15 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "rpcwallet.hpp"
 
-#include <xayagame/signatures.hpp>
-#include <xayautil/base64.hpp>
+#include <xgame/signatures.hpp>
+#include <xutil/base64.hpp>
 
 #include <glog/logging.h>
 
-namespace xaya
+namespace spacexpanse
 {
 
 std::string
@@ -19,7 +19,7 @@ RpcSignatureVerifier::RecoverSigner (const std::string& msg,
   return VerifyMessage (rpc, msg, EncodeBase64 (sgn));
 }
 
-RpcSignatureSigner::RpcSignatureSigner (XayaWalletRpcClient& w,
+RpcSignatureSigner::RpcSignatureSigner (XWalletRpcClient& w,
                                         const std::string& addr)
   : wallet(w), address(addr)
 {
@@ -73,4 +73,4 @@ RpcTransactionSender::IsPending (const uint256& txid) const
   return false;
 }
 
-} // namespace xaya
+} // namespace spacexpanse

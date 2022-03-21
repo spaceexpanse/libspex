@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,7 +7,7 @@
 
 #include "assets.hpp"
 
-#include <xayagame/sqlitestorage.hpp>
+#include <xgame/sqlitestorage.hpp>
 
 #include <json/json.h>
 
@@ -20,7 +20,7 @@ namespace nf
  * Extracts the balance of a given asset and user from the database.
  * Returns 0 if there is no entry.
  */
-Amount GetDbBalance (const xaya::SQLiteDatabase& db, const Asset& a,
+Amount GetDbBalance (const spacexpanse::SQLiteDatabase& db, const Asset& a,
                      const std::string& name);
 
 /**
@@ -61,7 +61,7 @@ protected:
    * The database we use.  It is used for reading the current state
    * when validating moves.
    */
-  const xaya::SQLiteDatabase& db;
+  const spacexpanse::SQLiteDatabase& db;
 
   /**
    * Called when a valid move to mint an asset has been found.  If there
@@ -99,7 +99,7 @@ protected:
 
 public:
 
-  explicit MoveParser (const xaya::SQLiteDatabase& d)
+  explicit MoveParser (const spacexpanse::SQLiteDatabase& d)
     : db(d)
   {}
 

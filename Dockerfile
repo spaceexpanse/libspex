@@ -1,10 +1,10 @@
-# Builds a Docker image that has libxayagame (and all its dependencies)
+# Builds a Docker image that has libxgame (and all its dependencies)
 # installed into /usr/local.  This can then be used as basis for images
 # that build (and run) e.g. GSPs.
 
 # Start by setting up a base image with all packages that we need
 # both for the build but also in the final image.  These are the dependencies
-# that are required as dev packages also for using libxayagame.
+# that are required as dev packages also for using libxgame.
 FROM alpine AS base
 RUN apk add --no-cache \
   curl-dev \
@@ -100,7 +100,7 @@ RUN ./autogen.sh \
 ARG ETHUTILS_VERSION="master"
 WORKDIR /usr/src/ethutils
 RUN git clone -b ${ETHUTILS_VERSION} \
-  https://github.com/xaya/eth-utils .
+  https://github.com/spacexpanse/eth-utils .
 RUN ./autogen.sh && ./configure && make && make install-strip
 
 # Also add a utility script for copying dynamic libraries needed for
@@ -115,9 +115,9 @@ RUN chmod a+x /usr/local/bin/cpld
 ENV PKG_CONFIG_PATH "/usr/local/lib64/pkgconfig"
 ENV LD_LIBRARY_PATH "/usr/local/lib:/usr/local/lib64"
 
-# Build and install libxayagame itself.  Make sure to clean out any
+# Build and install libxgame itself.  Make sure to clean out any
 # potential garbage copied over in the build context.
-WORKDIR /usr/src/libxayagame
+WORKDIR /usr/src/libxgame
 COPY . .
 RUN make distclean || true
 RUN ./autogen.sh && ./configure && make && make install-strip
@@ -132,4 +132,4 @@ ENV LD_LIBRARY_PATH "/usr/local/lib:/usr/local/lib64"
 RUN apk add --no-cache \
   bash \
   gflags
-LABEL description="Development image with libxayagame and dependencies"
+LABEL description="Development image with libxgame and dependencies"

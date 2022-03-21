@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,7 +11,7 @@
 
 #include <sstream>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /* ************************************************************************** */
@@ -255,4 +255,4 @@ TestGameFixture::GetDb ()
 
 /* ************************************************************************** */
 
-} // namespace xaya
+} // namespace spacexpanse

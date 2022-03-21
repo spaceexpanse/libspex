@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2021 The Xaya developers
+// Copyright (C) 2019-2021 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,8 +10,8 @@
 #include <gamechannel/boardrules.hpp>
 #include <gamechannel/channelgame.hpp>
 #include <gamechannel/proto/metadata.pb.h>
-#include <xayagame/sqlitestorage.hpp>
-#include <xayautil/uint256.hpp>
+#include <xgame/sqlitestorage.hpp>
+#include <xutil/uint256.hpp>
 
 #include <json/json.h>
 
@@ -32,11 +32,11 @@ constexpr unsigned DISPUTE_BLOCKS = 10;
 constexpr unsigned CHANNEL_TIMEOUT_BLOCKS = 12;
 
 /**
- * The main game logic for the on-chain part of Xayaships.  This takes care of
+ * The main game logic for the on-chain part of Xships.  This takes care of
  * the public game state (win/loss statistics for names), management of open
  * channels and dispute processing.
  */
-class ShipsLogic : public xaya::ChannelGame
+class ShipsLogic : public spacexpanse::ChannelGame
 {
 
 private:
@@ -47,20 +47,20 @@ private:
    * Tries to process a move declaring one participant of a channel
    * the loser.
    */
-  void HandleDeclareLoss (xaya::SQLiteDatabase& db,
+  void HandleDeclareLoss (spacexpanse::SQLiteDatabase& db,
                           const Json::Value& obj, const std::string& name);
 
   /**
    * Tries to process a dispute/resolution move.
    */
-  void HandleDisputeResolution (xaya::SQLiteDatabase& db,
+  void HandleDisputeResolution (spacexpanse::SQLiteDatabase& db,
                                 const Json::Value& obj, unsigned height,
                                 bool isDispute);
 
   /**
    * Processes all expired disputes, force-closing the channels.
    */
-  void ProcessExpiredDisputes (xaya::SQLiteDatabase& db, unsigned height);
+  void ProcessExpiredDisputes (spacexpanse::SQLiteDatabase& db, unsigned height);
 
   /**
    * Updates the game stats in the global database state for a channel that
@@ -68,8 +68,8 @@ private:
    * (remove) the channel itself from the database; it just updates the
    * game_stats table.
    */
-  static void UpdateStats (xaya::SQLiteDatabase& db,
-                           const xaya::proto::ChannelMetadata& meta,
+  static void UpdateStats (spacexpanse::SQLiteDatabase& db,
+                           const spacexpanse::proto::ChannelMetadata& meta,
                            int winner);
 
   friend class InMemoryLogicFixture;
@@ -78,29 +78,29 @@ private:
 
 protected:
 
-  void SetupSchema (xaya::SQLiteDatabase& db) override;
+  void SetupSchema (spacexpanse::SQLiteDatabase& db) override;
 
   void GetInitialStateBlock (unsigned& height,
                              std::string& hashHex) const override;
-  void InitialiseState (xaya::SQLiteDatabase& db) override;
+  void InitialiseState (spacexpanse::SQLiteDatabase& db) override;
 
-  void UpdateState (xaya::SQLiteDatabase& db,
+  void UpdateState (spacexpanse::SQLiteDatabase& db,
                     const Json::Value& blockData) override;
 
-  Json::Value GetStateAsJson (const xaya::SQLiteDatabase& db) override;
+  Json::Value GetStateAsJson (const spacexpanse::SQLiteDatabase& db) override;
 
 public:
 
-  const xaya::BoardRules& GetBoardRules () const override;
+  const spacexpanse::BoardRules& GetBoardRules () const override;
 
 };
 
 /**
- * PendingMoveProcessor for Xayaships.  This passes StateProofs recovered
+ * PendingMoveProcessor for Xships.  This passes StateProofs recovered
  * from pending disputes and resolutions to ChannelGame::PendingMoves, and
  * keeps track of basic things like created/joined/aborted channels.
  */
-class ShipsPending : public xaya::ChannelGame::PendingMoves
+class ShipsPending : public spacexpanse::ChannelGame::PendingMoves
 {
 
 private:
@@ -117,7 +117,7 @@ private:
   Json::Value join;
 
   /** Channels being aborted with pending moves.  */
-  std::set<xaya::uint256> abort;
+  std::set<spacexpanse::uint256> abort;
 
   /**
    * Clears the internal state for ships (not including the Clear
@@ -129,24 +129,24 @@ private:
    * Tries to process a pending "create channel" move.
    */
   void HandleCreateChannel (const Json::Value& obj, const std::string& name,
-                            const xaya::uint256& txid);
+                            const spacexpanse::uint256& txid);
 
   /**
    * Tries to process a pending "join channel" move.
    */
-  void HandleJoinChannel (xaya::SQLiteDatabase& db, const Json::Value& obj,
+  void HandleJoinChannel (spacexpanse::SQLiteDatabase& db, const Json::Value& obj,
                           const std::string& name);
 
   /**
    * Tries to process a pending "abort channel" move.
    */
-  void HandleAbortChannel (xaya::SQLiteDatabase& db, const Json::Value& obj,
+  void HandleAbortChannel (spacexpanse::SQLiteDatabase& db, const Json::Value& obj,
                            const std::string& name);
 
   /**
    * Tries to process a pending dispute or resolution move.
    */
-  void HandleDisputeResolution (xaya::SQLiteDatabase& db,
+  void HandleDisputeResolution (spacexpanse::SQLiteDatabase& db,
                                 const Json::Value& obj);
 
   /**
@@ -154,7 +154,7 @@ private:
    * used in tests, so that we can get away without setting up a consistent
    * current state in the database.
    */
-  void AddPendingMoveUnsafe (const xaya::SQLiteDatabase& db,
+  void AddPendingMoveUnsafe (const spacexpanse::SQLiteDatabase& db,
                              const Json::Value& mv);
 
   friend class PendingTests;

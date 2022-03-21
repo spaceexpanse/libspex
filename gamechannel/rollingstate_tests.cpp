@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,7 +7,7 @@
 #include "stateproof.hpp"
 #include "testgame.hpp"
 
-#include <xayautil/hash.hpp>
+#include <xutil/hash.hpp>
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/util/message_differencer.h>
@@ -16,7 +16,7 @@
 
 #include <glog/logging.h>
 
-namespace xaya
+namespace spacexpanse
 {
 namespace
 {
@@ -388,4 +388,4 @@ TEST_F (RollingStateTests, UpdateWithMoveSuccessful)
 /* ************************************************************************** */
 
 } // anonymous namespace
-} // namespace xaya
+} // namespace spacexpanse

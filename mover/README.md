@@ -1,10 +1,10 @@
-# Xaya Mover
+# SpaceXpanse Mover
 
-**Mover** is a simple game on the [Xaya platform](https://xaya.io/), where
+**Mover** is a simple game on the [SpaceXpanse platform](https://spacexpanse.org/), where
 players can **move around in an infinite plane**.  It is fully functional, but
-mainly meant to illustrate the use of `libxayagame`.  The source code can
+mainly meant to illustrate the use of `libxgame`.  The source code can
 also be used as basis for implementing more complex games.
-The Xaya game ID for mover is **`mv`**.
+The SpaceXpanse game ID for mover is **`mv`**.
 
 ## Game State
 
@@ -15,7 +15,7 @@ Optionally, the player may be **moving for `n` more turns** into one of the
 
 ## Moves
 
-[Moves](https://github.com/xaya/Specs/blob/master/games.md#moves)
+[Moves](https://github.com/spacexpanse/Specs/blob/master/games.md#moves)
 are represented by a JSON object that specifies how the player
 should be moved in the game world:
 

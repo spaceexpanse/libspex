@@ -1,4 +1,4 @@
-// Copyright (C) 2019 The Xaya developers
+// Copyright (C) 2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,7 +6,7 @@
 
 #include "movesender.hpp"
 
-namespace xaya
+namespace spacexpanse
 {
 
 bool
@@ -20,4 +20,4 @@ OpenChannel::MaybeOnChainMove (const ParsedBoardState& state,
                                MoveSender& sender)
 {}
 
-} // namespace xaya
+} // namespace spacexpanse

@@ -1,9 +1,9 @@
--- Copyright (C) 2019 The Xaya developers
+-- Copyright (C) 2019 The XAYA developers
 -- Distributed under the MIT software license, see the accompanying
 -- file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 -- The data for all open game channels that is part of the global game state.
-CREATE TABLE IF NOT EXISTS `xayagame_game_channels` (
+CREATE TABLE IF NOT EXISTS `xgame_game_channels` (
 
   -- The ID of the channel, which is typically the txid that created it.
   `id` BLOB PRIMARY KEY,
@@ -27,5 +27,5 @@ CREATE TABLE IF NOT EXISTS `xayagame_game_channels` (
 
 -- We need to look up disputed channels by height, so that we can iterate
 -- over all timed out channels and process them.
-CREATE INDEX IF NOT EXISTS `xayagame_game_channels_by_disputeheight`
-    ON `xayagame_game_channels` (`disputeheight`);
+CREATE INDEX IF NOT EXISTS `xgame_game_channels_by_disputeheight`
+    ON `xgame_game_channels` (`disputeheight`);

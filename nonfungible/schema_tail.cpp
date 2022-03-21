@@ -3,7 +3,7 @@
 } // anonymous namespace
 
 void
-SetupDatabaseSchema (xaya::SQLiteDatabase& db)
+SetupDatabaseSchema (spacexpanse::SQLiteDatabase& db)
 {
   db.Execute (SCHEMA_SQL);
 }

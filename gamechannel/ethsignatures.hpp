@@ -1,4 +1,4 @@
-// Copyright (C) 2022 The Xaya developers
+// Copyright (C) 2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,7 +11,7 @@
 
 #include <string>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -20,7 +20,7 @@ namespace xaya
  * typically.
  *
  * This signing scheme is self-contained and does not rely on an RPC connection
- * or any other external resources (unlike the Xaya Core based message
+ * or any other external resources (unlike the SpaceXpanse Core based message
  * signing from rpcwallet).  It happens to be based on Ethereum addresses and
  * the Ethereum message signing scheme, but can be applied to any channel
  * applications (not just ones built on top of an Ethereum-like blockchain).
@@ -73,6 +73,6 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_ETHSIGNATURES_HPP

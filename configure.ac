@@ -1,4 +1,4 @@
-AC_INIT([libxayagame], [0.1])
+AC_INIT([libxgame], [0.1])
 AM_INIT_AUTOMAKE([subdir-objects])
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -26,12 +26,12 @@ AX_CHECK_COMPILE_FLAG([-Wno-deprecated],
 # See https://hpc.nih.gov/development/glog.html.
 CXXFLAGS="${CXXFLAGS} -DGLOG_NO_ABBREVIATED_SEVERITIES"
 
-# Public dependencies (exposed in the headers of libxayagame to
+# Public dependencies (exposed in the headers of libxgame to
 # users of the library).
 # jsoncpp 1.7.5 first included a fix for
 # https://github.com/open-source-parsers/jsoncpp/issues/511.  We need this,
 # since we use it to enforce rules on when uncompressing JSON values with
-# xayautil.
+# xutil.
 AX_PKG_CHECK_MODULES([JSONCPP], [jsoncpp >= 1.7.5], [])
 AX_PKG_CHECK_MODULES([JSONRPCCLIENT], [libjsonrpccpp-client], [])
 AX_PKG_CHECK_MODULES([JSONRPCSERVER], [libjsonrpccpp-server], [])
@@ -54,7 +54,7 @@ AX_PKG_CHECK_MODULES([ZLIB], [], [zlib >= 1.2.11])
 # which requires at least version 4.3.1.
 AX_PKG_CHECK_MODULES([ZMQ], [], [libzmq >= 4.3.1])
 
-# Private dependencies that are not needed for libxayagame, but only for
+# Private dependencies that are not needed for libxgame, but only for
 # the unit tests and the example binaries.
 PKG_CHECK_MODULES([GFLAGS], [gflags])
 PKG_CHECK_MODULES([GTEST], [gmock gtest_main])
@@ -70,14 +70,14 @@ AC_CONFIG_FILES([
   ships/channeltest/Makefile \
   ships/gametest/Makefile \
   websocket/Makefile \
-  xayagame/Makefile \
-  xayagametest/Makefile \
-  xayautil/Makefile \
+  xgame/Makefile \
+  xgametest/Makefile \
+  xutil/Makefile \
   \
   gamechannel/channelcore.pc \
   gamechannel/gamechannel.pc \
-  xayagame/libxayagame.pc \
-  xayautil/libxayautil.pc
+  xgame/libxgame.pc \
+  xutil/libxutil.pc
 ])
 AC_OUTPUT
 

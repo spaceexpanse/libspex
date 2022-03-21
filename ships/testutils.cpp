@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2020 The Xaya developers
+// Copyright (C) 2019-2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -29,12 +29,12 @@ InMemoryLogicFixture::InMemoryLogicFixture ()
   : game(verifier)
 {
   game.Initialise (":memory:");
-  game.InitialiseGameContext (xaya::Chain::MAIN, "xs", nullptr);
+  game.InitialiseGameContext (spacexpanse::Chain::MAIN, "xs", nullptr);
   game.GetStorage ().Initialise ();
   /* The initialisation above already sets up the database schema.  */
 }
 
-xaya::SQLiteDatabase&
+spacexpanse::SQLiteDatabase&
 InMemoryLogicFixture::GetDb ()
 {
   return game.GetDatabaseForTesting ();

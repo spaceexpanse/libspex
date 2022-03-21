@@ -1,4 +1,4 @@
-// Copyright (C) 2019 The Xaya developers
+// Copyright (C) 2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -34,7 +34,7 @@ private:
    * The ChannelDaemon instance to use for RPC processing.  This by itself
    * also exposes the underlying ChannelManager.
    */
-  xaya::ChannelDaemon& daemon;
+  spacexpanse::ChannelDaemon& daemon;
 
   /**
    * Extends a given state JSON by extra data from the ShipsChannel directly
@@ -47,12 +47,12 @@ private:
    * we already hold the lock on the channel manager, and pass the instance
    * in directly.
    */
-  static void ProcessLocalMove (xaya::ChannelManager& cm,
+  static void ProcessLocalMove (spacexpanse::ChannelManager& cm,
                                 const proto::BoardMove& mv);
 
 public:
 
-  explicit ShipsChannelRpcServer (ShipsChannel& c, xaya::ChannelDaemon& d,
+  explicit ShipsChannelRpcServer (ShipsChannel& c, spacexpanse::ChannelDaemon& d,
                                   jsonrpc::AbstractServerConnector& conn)
     : ShipsChannelRpcServerStub(conn), channel(c), daemon(d)
   {}

@@ -1,8 +1,8 @@
--- Copyright (C) 2019-2021 The Xaya developers
+-- Copyright (C) 2019-2021 The XAYA developers
 -- Distributed under the MIT software license, see the accompanying
 -- file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
--- Statistics about won/lost games by Xaya name.
+-- Statistics about won/lost games by SpaceXpanse name.
 CREATE TABLE IF NOT EXISTS `game_stats` (
 
   -- The p/ name for an entry.

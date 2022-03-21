@@ -1,12 +1,12 @@
-// Copyright (C) 2019 The Xaya developers
+// Copyright (C) 2019 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef MOVER_PENDING_HPP
 #define MOVER_PENDING_HPP
 
-#include "xayagame/pendingmoves.hpp"
-#include "xayagame/storage.hpp"
+#include "xgame/pendingmoves.hpp"
+#include "xgame/storage.hpp"
 
 #include <json/json.h>
 
@@ -18,7 +18,7 @@ namespace mover
  * the latest update for each name and the projected target of the movement,
  * i.e. what it would be when all pending moves were confirmed.
  */
-class PendingMoves : public xaya::PendingMoveProcessor
+class PendingMoves : public spacexpanse::PendingMoveProcessor
 {
 
 private:
@@ -36,7 +36,7 @@ private:
    * so that we can specify the current game state without going through the
    * upstream PendingMoveProcessor logic.
    */
-  void AddPendingMoveInternal (const xaya::GameStateData& state,
+  void AddPendingMoveInternal (const spacexpanse::GameStateData& state,
                                const Json::Value& mv);
 
   friend class PendingMoveTests;

@@ -1,4 +1,4 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +10,7 @@ namespace nf
 {
 
 Amount
-GetDbBalance (const xaya::SQLiteDatabase& db, const Asset& a,
+GetDbBalance (const spacexpanse::SQLiteDatabase& db, const Asset& a,
               const std::string& name)
 {
   auto stmt = db.PrepareRo (R"(

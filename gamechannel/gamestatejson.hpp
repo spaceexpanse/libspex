@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +10,7 @@
 
 #include <json/json.h>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -25,6 +25,6 @@ Json::Value ChannelToGameStateJson (const ChannelData& ch, const BoardRules& r);
 Json::Value AllChannelsGameStateJson (ChannelsTable& tbl,
                                       const BoardRules& r);
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #endif // GAMECHANNEL_GAMESTATEJSON_HPP

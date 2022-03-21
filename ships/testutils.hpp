@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,8 +10,8 @@
 
 #include <gamechannel/signatures.hpp>
 #include <gamechannel/testutils.hpp>
-#include <xayagame/sqlitestorage.hpp>
-#include <xayagame/testutils.hpp>
+#include <xgame/sqlitestorage.hpp>
+#include <xgame/testutils.hpp>
 
 #include <json/json.h>
 
@@ -47,11 +47,11 @@ private:
   private:
 
     /** The verifier used.  */
-    const xaya::SignatureVerifier& verifier;
+    const spacexpanse::SignatureVerifier& verifier;
 
   protected:
 
-    const xaya::SignatureVerifier&
+    const spacexpanse::SignatureVerifier&
     GetSignatureVerifier () override
     {
       return verifier;
@@ -59,7 +59,7 @@ private:
 
   public:
 
-    explicit ShipsLogicWithVerifier (const xaya::SignatureVerifier& v)
+    explicit ShipsLogicWithVerifier (const spacexpanse::SignatureVerifier& v)
       : verifier(v)
     {}
 
@@ -67,7 +67,7 @@ private:
 
 protected:
 
-  xaya::MockSignatureVerifier verifier;
+  spacexpanse::MockSignatureVerifier verifier;
   ShipsLogicWithVerifier game;
 
   /**
@@ -79,7 +79,7 @@ protected:
   /**
    * Returns the raw database handle of the test game.
    */
-  xaya::SQLiteDatabase& GetDb ();
+  spacexpanse::SQLiteDatabase& GetDb ();
 
   /**
    * Returns our board rules.

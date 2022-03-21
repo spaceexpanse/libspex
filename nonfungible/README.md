@@ -1,16 +1,16 @@
 # Non-Fungible Assets
 
-While Xaya empowers game developers to build *fully decentralised
+While SpaceXpanse empowers game developers to build *fully decentralised
 and yet complex games*, there are also a lot of potential applications
 based on just generic fungible and non-fungible tokens.  The `nonfungible` GSP
-is an application built on Xaya that implements such tokens, which
+is an application built on SpaceXpanse that implements such tokens, which
 everyone can issue, transfer and collect, in a way similar to
 [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155) on Ethereum.
 
 Besides being a potentially useful application, this is also a simple
-example for using libxayagame together with [SQLite](https://www.sqlite.org/),
+example for using libxgame together with [SQLite](https://www.sqlite.org/),
 and is used as a demo and for testing the
-[Democrit framework](https://github.com/xaya/democrit) for atomic trading.
+[Democrit framework](https://github.com/spacexpanse/democrit) for atomic trading.
 
 This application is using `g/nf` as its game ID.
 
@@ -63,7 +63,7 @@ For the first part, the game state simply contains an append-only list
 of created assets and their associated custom string data.
 
 The balances are simply unsigned 64-bit integers keyed by (user, asset)
-holding the balance of a certain asset by some Xaya user (`p/` name).
+holding the balance of a certain asset by some SpaceXpanse user (`p/` name).
 Note that all balances are integers; but of course those balances could
 be "interpreted" and shown by some front-end application as decimal numbers.
 
@@ -121,8 +121,8 @@ If `NUMBER` is larger than zero and not larger than the user's current
 balance of `ASSET`, then the balance is decreased by `NUMBER` and the
 balance of `RECIPIENT` is increased accordingly.  Note that it is perfectly
 valid to send a token to any arbitrary `RECIPIENT`, even if the corresponding
-`p/` name has not even been registered on the Xaya blockchain yet, or would
-be invalid as name on Xaya.  (In which
+`p/` name has not even been registered on the SpaceXpanse blockchain yet, or would
+be invalid as name on SpaceXpanse.  (In which
 case anyone can register the name and thereby claim ownership of the token
 balance sent to it.)
 

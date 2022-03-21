@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -14,7 +14,7 @@
 
 #include "proto/stateproof.pb.h"
 
-#include <xayautil/uint256.hpp>
+#include <xutil/uint256.hpp>
 
 #include <json/json.h>
 
@@ -22,7 +22,7 @@
 #include <set>
 #include <string>
 
-namespace xaya
+namespace spacexpanse
 {
 
 /**
@@ -93,7 +93,7 @@ private:
   const uint256 channelId;
 
   /**
-   * The Xaya name that corresponds to the player that is using the
+   * The SpaceXpanse name that corresponds to the player that is using the
    * current channel daemon (without p/ prefix).
    */
   const std::string playerName;
@@ -321,7 +321,7 @@ public:
 
 };
 
-} // namespace xaya
+} // namespace spacexpanse
 
 #include "channelmanager.tpp"
 

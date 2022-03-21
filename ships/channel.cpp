@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2021 The Xaya developers
+// Copyright (C) 2019-2021 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,8 +7,8 @@
 #include <gamechannel/proto/signatures.pb.h>
 #include <gamechannel/protoutils.hpp>
 #include <gamechannel/signatures.hpp>
-#include <xayautil/base64.hpp>
-#include <xayautil/hash.hpp>
+#include <xutil/base64.hpp>
+#include <xutil/hash.hpp>
 
 namespace ships
 {
@@ -45,7 +45,7 @@ ShipsChannel::SetPosition (const Grid& g)
     }
 
   position = g;
-  positionSalt = rnd.Get<xaya::uint256> ();
+  positionSalt = rnd.Get<spacexpanse::uint256> ();
   LOG (INFO)
       << "Stored player position " << position.GetBits ()
       << " and generated salt: " << positionSalt.ToHex ();
@@ -101,7 +101,7 @@ ShipsChannel::AutoPositionCommitment (proto::BoardMove& mv)
   if (!IsPositionSet ())
     return false;
 
-  xaya::SHA256 hasher;
+  spacexpanse::SHA256 hasher;
   hasher << position.Blob () << positionSalt;
   const std::string hashStr = hasher.Finalise ().GetBinaryString ();
 
@@ -128,10 +128,10 @@ ShipsChannel::InternalAutoMove (const ShipsBoardState& state,
         if (!AutoPositionCommitment (mv))
           return false;
 
-        seed0 = rnd.Get<xaya::uint256> ();
+        seed0 = rnd.Get<spacexpanse::uint256> ();
         LOG (INFO) << "Random seed for first player: " << seed0.ToHex ();
 
-        xaya::SHA256 seedHasher;
+        spacexpanse::SHA256 seedHasher;
         seedHasher << seed0;
         const std::string seedHash = seedHasher.Finalise ().GetBinaryString ();
 
@@ -146,7 +146,7 @@ ShipsChannel::InternalAutoMove (const ShipsBoardState& state,
         if (!AutoPositionCommitment (mv))
           return false;
 
-        const auto seed1 = rnd.Get<xaya::uint256> ();
+        const auto seed1 = rnd.Get<spacexpanse::uint256> ();
         LOG (INFO) << "Random seed for second player: " << seed1.ToHex ();
 
         mv.mutable_position_commitment ()->set_seed (seed1.GetBinaryString ());
@@ -210,12 +210,12 @@ namespace
 
 Json::Value
 DisputeResolutionMove (const std::string& type,
-                       const xaya::uint256& channelId,
-                       const xaya::proto::StateProof& p)
+                       const spacexpanse::uint256& channelId,
+                       const spacexpanse::proto::StateProof& p)
 {
   Json::Value data(Json::objectValue);
   data["id"] = channelId.ToHex ();
-  data["state"] = xaya::ProtoToBase64 (p);
+  data["state"] = spacexpanse::ProtoToBase64 (p);
 
   Json::Value res(Json::objectValue);
   res[type] = data;
@@ -226,22 +226,22 @@ DisputeResolutionMove (const std::string& type,
 } // anonymous namespace
 
 Json::Value
-ShipsChannel::ResolutionMove (const xaya::uint256& channelId,
-                              const xaya::proto::StateProof& p) const
+ShipsChannel::ResolutionMove (const spacexpanse::uint256& channelId,
+                              const spacexpanse::proto::StateProof& p) const
 {
   return DisputeResolutionMove ("r", channelId, p);
 }
 
 Json::Value
-ShipsChannel::DisputeMove (const xaya::uint256& channelId,
-                           const xaya::proto::StateProof& p) const
+ShipsChannel::DisputeMove (const spacexpanse::uint256& channelId,
+                           const spacexpanse::proto::StateProof& p) const
 {
   return DisputeResolutionMove ("d", channelId, p);
 }
 
 bool
-ShipsChannel::MaybeAutoMove (const xaya::ParsedBoardState& state,
-                             xaya::BoardMove& mv)
+ShipsChannel::MaybeAutoMove (const spacexpanse::ParsedBoardState& state,
+                             spacexpanse::BoardMove& mv)
 {
   const auto& shipsState = dynamic_cast<const ShipsBoardState&> (state);
 
@@ -254,8 +254,8 @@ ShipsChannel::MaybeAutoMove (const xaya::ParsedBoardState& state,
 }
 
 void
-ShipsChannel::MaybeOnChainMove (const xaya::ParsedBoardState& state,
-                                xaya::MoveSender& sender)
+ShipsChannel::MaybeOnChainMove (const spacexpanse::ParsedBoardState& state,
+                                spacexpanse::MoveSender& sender)
 {
   const auto& shipsState = dynamic_cast<const ShipsBoardState&> (state);
   const auto& id = shipsState.GetChannelId ();
@@ -293,7 +293,7 @@ ShipsChannel::MaybeOnChainMove (const xaya::ParsedBoardState& state,
 
   Json::Value data(Json::objectValue);
   data["id"] = id.ToHex ();
-  data["r"] = xaya::EncodeBase64 (meta.reinit ());
+  data["r"] = spacexpanse::EncodeBase64 (meta.reinit ());
 
   Json::Value mv(Json::objectValue);
   mv["l"] = data;

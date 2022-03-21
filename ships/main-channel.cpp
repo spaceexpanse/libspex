@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2022 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,8 +10,8 @@
 #include <gamechannel/daemon.hpp>
 #include <gamechannel/rpcbroadcast.hpp>
 #include <gamechannel/rpcwallet.hpp>
-#include <xayagame/rpc-stubs/xayarpcclient.h>
-#include <xayagame/rpc-stubs/xayawalletrpcclient.h>
+#include <xgame/rpc-stubs/xrpcclient.h>
+#include <xgame/rpc-stubs/xwalletrpcclient.h>
 
 #include <jsonrpccpp/client/connectors/httpclient.h>
 #include <jsonrpccpp/server.h>
@@ -28,12 +28,12 @@
 namespace
 {
 
-DEFINE_string (xaya_rpc_url, "",
-               "URL at which Xaya Core's JSON-RPC interface is available"
+DEFINE_string (x_rpc_url, "",
+               "URL at which SpaceXpanse Core's JSON-RPC interface is available"
                " including a wallet");
-DEFINE_bool (xaya_rpc_legacy_protocol, true,
-             "whether to use JSON-RPC 1.0 instead of 2.0 for the Xaya RPC;"
-             " this is needed for Xaya Core, whereas other servers"
+DEFINE_bool (x_rpc_legacy_protocol, true,
+             "whether to use JSON-RPC 1.0 instead of 2.0 for the SpaceXpanse RPC;"
+             " this is needed for SpaceXpanse Core, whereas other servers"
              " like Electrum-CHI should use JSON-RPC 2.0");
 DEFINE_string (gsp_rpc_url, "",
                "URL at which the shipsd JSON-RPC interface is available");
@@ -48,9 +48,9 @@ DEFINE_bool (rpc_listen_locally, true,
              "whether the JSON-RPC server should listen locally");
 
 DEFINE_string (playername, "",
-               "the Xaya name of the player for this channel (without p/)");
+               "the SpaceXpanse name of the player for this channel (without p/)");
 DEFINE_string (address, "",
-               "the Xaya address used for signing on the channel");
+               "the SpaceXpanse address used for signing on the channel");
 DEFINE_string (channelid, "", "ID of the channel to manage as hex string");
 
 } // anonymous namespace
@@ -61,13 +61,13 @@ main (int argc, char** argv)
   google::InitGoogleLogging (argv[0]);
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-  gflags::SetUsageMessage ("Run Xayaships channel daemon");
+  gflags::SetUsageMessage ("Run Xships channel daemon");
   gflags::SetVersionString (PACKAGE_VERSION);
   gflags::ParseCommandLineFlags (&argc, &argv, true);
 
-  if (FLAGS_xaya_rpc_url.empty ())
+  if (FLAGS_x_rpc_url.empty ())
     {
-      std::cerr << "Error: --xaya_rpc_url must be set" << std::endl;
+      std::cerr << "Error: --x_rpc_url must be set" << std::endl;
       return EXIT_FAILURE;
     }
   if (FLAGS_gsp_rpc_url.empty ())
@@ -92,32 +92,32 @@ main (int argc, char** argv)
       return EXIT_FAILURE;
     }
 
-  xaya::uint256 channelId;
+  spacexpanse::uint256 channelId;
   if (!channelId.FromHex (FLAGS_channelid))
     {
       std::cerr << "Error: --channelid is invalid" << std::endl;
       return EXIT_FAILURE;
     }
 
-  const auto rpcVersion = (FLAGS_xaya_rpc_legacy_protocol
+  const auto rpcVersion = (FLAGS_x_rpc_legacy_protocol
                               ? jsonrpc::JSONRPC_CLIENT_V1
                               : jsonrpc::JSONRPC_CLIENT_V2);
-  jsonrpc::HttpClient xayaClient(FLAGS_xaya_rpc_url);
-  XayaRpcClient xayaRpc(xayaClient, rpcVersion);
-  XayaWalletRpcClient xayaWallet(xayaClient, rpcVersion);
+  jsonrpc::HttpClient xClient(FLAGS_x_rpc_url);
+  XRpcClient xRpc(xClient, rpcVersion);
+  XWalletRpcClient xWallet(xClient, rpcVersion);
 
-  const xaya::RpcSignatureVerifier verifier(xayaRpc);
-  xaya::RpcSignatureSigner signer(xayaWallet, FLAGS_address);
-  xaya::RpcTransactionSender sender(xayaRpc, xayaWallet);
+  const spacexpanse::RpcSignatureVerifier verifier(xRpc);
+  spacexpanse::RpcSignatureSigner signer(xWallet, FLAGS_address);
+  spacexpanse::RpcTransactionSender sender(xRpc, xWallet);
 
   ships::ShipsBoardRules rules;
   ships::ShipsChannel channel(FLAGS_playername);
 
-  xaya::ChannelDaemon daemon("xs", channelId, FLAGS_playername, rules, channel);
+  spacexpanse::ChannelDaemon daemon("xs", channelId, FLAGS_playername, rules, channel);
   daemon.ConnectWallet (verifier, signer, sender);
   daemon.ConnectGspRpc (FLAGS_gsp_rpc_url);
 
-  xaya::RpcBroadcast bc(FLAGS_broadcast_rpc_url, daemon.GetChannelManager ());
+  spacexpanse::RpcBroadcast bc(FLAGS_broadcast_rpc_url, daemon.GetChannelManager ());
   daemon.SetOffChainBroadcast (bc);
 
   std::unique_ptr<jsonrpc::AbstractServerConnector> serverConnector;

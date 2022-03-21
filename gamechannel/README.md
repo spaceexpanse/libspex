@@ -9,14 +9,14 @@ fashion.
 This folder contains a flexible implementation of the core framework
 necessary to build applications that use them.  The starting point for
 building a game-channel-enabled application is the [`BoardRules`
-interface](https://github.com/xaya/libxayagame/blob/master/gamechannel/boardrules.hpp),
+interface](https://github.com/spacexpanse/libxgame/blob/master/gamechannel/boardrules.hpp),
 which defines the concrete rules by which interactions on a channel are done.
 
 ## Channel Core
 
 The `channelcore` library contains the main parts of the general framework,
 where the
-[`ChannelManager`](https://github.com/xaya/libxayagame/blob/master/gamechannel/channelmanager.hpp)
+[`ChannelManager`](https://github.com/spacexpanse/libxgame/blob/master/gamechannel/channelmanager.hpp)
 is the main class that applications should use.  It handles all the core
 tasks necessary for a channel application, like
 constructing and verifying state proofs, handling disputes and resolutions, and
@@ -28,12 +28,12 @@ This library is relatively light-weight.  In particular, it does not
 use any networking, JSON-RPC, threading or other complex dependencies.
 As such, it can be used in contexts like web-based frontends (e.g. with wasm)
 relatively easily, and also can be used to build channels that are not
-necessarily linked to a Xaya GSP.
+necessarily linked to a SpaceXpanse GSP.
 
-## Game-Channels on Xaya
+## Game-Channels on SpaceXpanse
 
 More advanced tasks are implemented in the `gamechannel` library:  They
 contain, for instance, event loops that automatically poll the state of
-a channel from a Xaya GSP to update the local state, or provide the
+a channel from a SpaceXpanse GSP to update the local state, or provide the
 tools necessary to build the on-chain parts for a channel-application easily
-based on a Xaya GSP.
+based on a SpaceXpanse GSP.

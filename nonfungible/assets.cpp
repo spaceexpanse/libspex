@@ -1,10 +1,10 @@
-// Copyright (C) 2020 The Xaya developers
+// Copyright (C) 2020 The XAYA developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "assets.hpp"
 
-#include "xayautil/jsonutils.hpp"
+#include "xutil/jsonutils.hpp"
 
 namespace nf
 {
@@ -18,7 +18,7 @@ AmountToJson (const Amount n)
 bool
 AmountFromJson (const Json::Value& val, Amount& n)
 {
-  if (!xaya::IsIntegerValue (val) || !val.isInt64 ())
+  if (!spacexpanse::IsIntegerValue (val) || !val.isInt64 ())
     return false;
 
   n = val.asInt64 ();
@@ -26,7 +26,7 @@ AmountFromJson (const Json::Value& val, Amount& n)
 }
 
 void
-Asset::BindToParams (xaya::SQLiteDatabase::Statement& stmt,
+Asset::BindToParams (spacexpanse::SQLiteDatabase::Statement& stmt,
                      const int indMinter, const int indName) const
 {
   stmt.Bind (indMinter, minter);
@@ -43,7 +43,7 @@ Asset::ToJson () const
 }
 
 Asset
-Asset::FromColumns (const xaya::SQLiteDatabase::Statement& stmt,
+Asset::FromColumns (const spacexpanse::SQLiteDatabase::Statement& stmt,
                     const int indMinter, const int indName)
 {
   return Asset (stmt.Get<std::string> (indMinter),
