@@ -45,7 +45,7 @@ jobs:
           .spacexpanse-params
         key: x86_64-unknown-linux-gnu-ccache-${{ env.NOW }} 
         restore-keys: |
-            x86_64-unknown-linux-gnu-ccache-
+             x86_64-unknown-linux-gnu-ccache-
     - run: |
         sudo apt-get update
         #sudo apt-get upgrade
