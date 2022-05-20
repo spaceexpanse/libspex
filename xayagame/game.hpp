@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2021 The Xaya developers
+// Copyright (C) 2018-2022 The Xaya developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -21,6 +21,7 @@
 #include <json/json.h>
 #include <jsonrpccpp/client.h>
 
+#include <atomic>
 #include <condition_variable>
 #include <functional>
 #include <memory>
@@ -43,6 +44,8 @@ class Game : private internal::ZmqListener
 {
 
 private:
+
+  class ConnectionCheckerThread;
 
   /**
    * States for the game engine during syncing / operation.  The basic states
@@ -72,6 +75,11 @@ private:
    * UP_TO_DATE:  As far as is known, we are at the current tip of the daemon.
    * Ordinary ZMQ notifications are processed as they come in for changes
    * to the tip, and we expect them to match the current block hash.
+   *
+   * DISCONNECTED:  The GSP is currently not actively connected to Xaya Core.
+   * This state occurs when the RPC connection to Xaya Core throws, or if
+   * we detect that the ZeroMQ connection seems to have stalled.  In this state,
+   * the GSP tries to reconnect / re-establish the ZMQ sockets and sync back up.
    */
   enum class State
   {
@@ -80,6 +88,7 @@ private:
     OUT_OF_SYNC,
     CATCHING_UP,
     UP_TO_DATE,
+    DISCONNECTED,
   };
 
   /** This game's game ID.  */
@@ -109,8 +118,13 @@ private:
   /** The chain type to which the game is connected.  */
   Chain chain = Chain::UNKNOWN;
 
-  /** The game's current state.  */
-  State state = State::UNKNOWN;
+  /**
+   * The game's current state.  For any changes and most access in general,
+   * we still protect it with mut.  But we use an atomic so that the state
+   * can be read without mutex lock from the health check (so that one
+   * is responsive).
+   */
+  std::atomic<State> state;
 
   /**
    * The game's genesis height, if known already.  We cache that from the
@@ -179,11 +193,15 @@ private:
   /** The pruning queue if we are pruning.  */
   std::unique_ptr<internal::PruningQueue> pruningQueue;
 
+  /** The background thread running regular connection checks, if any.  */
+  std::unique_ptr<ConnectionCheckerThread> connectionChecker;
+
   void BlockAttach (const std::string& id, const Json::Value& data,
                     bool seqMismatch) override;
   void BlockDetach (const std::string& id, const Json::Value& data,
                     bool seqMismatch) override;
   void PendingMove (const std::string& id, const Json::Value& data) override;
+  void HasStopped () override;
 
   /**
    * Adds this game's ID to the tracked games of the core daemon.
@@ -240,6 +258,14 @@ private:
    * daemon with getblockchaininfo and then determines what needs to be done.
    */
   void ReinitialiseState ();
+
+  /**
+   * Checks if the connection seems fine (e.g. ZMQ staleness), marks the
+   * state as disconnected if not, and tries to reconnect if the state
+   * is disconnected.  This is run periodically by a background thread
+   * while the GSP is supposed to be running.
+   */
+  void ProbeAndFixConnection ();
 
   /**
    * Notifies potentially-waiting threads that the state has changed.  Callers
@@ -299,6 +325,7 @@ public:
     = std::function<Json::Value (const GameStateData& state)>;
 
   explicit Game (const std::string& id);
+  ~Game ();
 
   Game () = delete;
   Game (const Game&) = delete;
@@ -442,6 +469,13 @@ public:
    * in the Xaya Core notifications, then this raises a JSON-RPC error.
    */
   Json::Value GetPendingJsonState () const;
+
+  /**
+   * Checks to see if the instance considers itself "healthy", i.e. able
+   * to properly serve clients.  This means that it is up-to-date (to its
+   * best knowledge).
+   */
+  bool IsHealthy () const;
 
   /**
    * Blocks the calling thread until a change to the game state has
