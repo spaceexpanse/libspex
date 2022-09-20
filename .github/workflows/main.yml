@@ -57,21 +57,9 @@ jobs:
         sudo apt-get update
         #sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libboost-program-options-dev    
         sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git autoconf autoconf-archive automake cmake git libtool pkg-config libcurl4-openssl-dev libssl-dev libmicrohttpd-dev make
-    - uses: actions/checkout@v2
-      with:
-        ref: ${{ github.ref_name }}
-    - uses: actions/cache@v2
-      with:
-        path: |
-          #depends/built
-          #depends/work/build
-          #depends/sdk-sources
-          #depends/x86_64-unknown-linux-gnu          
-        key: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-${{ env.NOW }} 
-        restore-keys: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-
     - run: cd ~/ 
     - run: mkdir jsoncpp && cd jsoncpp
-    - run: rm -rf .jsoncpp
+    #- run: rm -rf .jsoncpp
     - run: ls -la
     #- run: git init
     #- run: git remote add origin https://github.com/open-source-parsers/jsoncpp
@@ -84,6 +72,18 @@ jobs:
     - run: cmake . -DJSONCPP_WITH_PKGCONFIG_SUPPORT=ON -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF
     - run: make -j2
     - run: sudo make install/strip
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.ref_name }}
+    - uses: actions/cache@v2
+      with:
+        path: |
+          #depends/built
+          #depends/work/build
+          #depends/sdk-sources
+          #depends/x86_64-unknown-linux-gnu          
+        key: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-${{ env.NOW }} 
+        restore-keys: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-
     - run: ./autogen.sh
     #- run: ./configure --enable-reduce-exports --enable-zmq --enable-glibc-back-compat --with-gui=qt5 LDFLAGS=-static-libstdc++ CPPFLAGS=-DDEBUG_LOCKORDER
     - run: ./configure
