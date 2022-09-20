@@ -73,7 +73,7 @@ jobs:
     - run: mkdir jsoncpp && cd jsoncpp
     #- run: git init
     #- run: git remote add origin https://github.com/open-source-parsers/jsoncpp
-    - run: git clone -b 1.9.4 https://github.com/open-source-parsers/jsoncpp .
+    - run: git clone -b 1.9.4 https://github.com/open-source-parsers/jsoncpp .jsoncpp
     - run: ls -la
     #- run: git pull
     #- run: git checkout 1.9.4 -f
