@@ -49,14 +49,14 @@ jobs:
     - run: |
         sudo apt-get update
         #sudo apt-get upgrade
-        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils python3
+        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" build-essential libargtable2-dev libzmq3-dev zlib1g-dev libsqlite3-dev liblmdb-dev libgoogle-glog-dev libgflags-dev libprotobuf-dev protobuf-compiler python3 python-protobuf
         sudo apt-get install software-properties-common
         sudo apt-add-repository "ppa:ondrej/php" -y
         #sudo apt-add-repository "ppa:bitcoin/bitcoin" -y
-        sudo apt-add-repository "ppa:deadsnakes/ppa" -y
+        #sudo apt-add-repository "ppa:deadsnakes/ppa" -y
         sudo apt-get update
         #sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libboost-program-options-dev    
-        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libjsoncpp-dev libjsonrpccpp-dev libjsonrpccpp-tools libzmq3-dev zlib1g-dev libsqlite3-dev liblmdb-dev libgoogle-glog-dev libgflags-dev python-protobuf libsecp256k1-dev python3-jsonrpclib-pelix
+        sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git autoconf autoconf-archive automake cmake git libtool pkg-config libcurl4-openssl-dev libssl-dev libmicrohttpd-dev make
     - uses: actions/checkout@v2
       with:
         ref: ${{ github.ref_name }}
@@ -69,12 +69,22 @@ jobs:
           depends/x86_64-unknown-linux-gnu          
         key: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-${{ env.NOW }} 
         restore-keys: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-
+    - run: cd ~/
+    - run: mkdir jsoncpp && cd jsoncpp
+    - run: git clone -b 1.9.4 https://github.com/open-source-parsers/jsoncpp .
+    - run: git config user.email "test@example.com"
+    - run: git config user.name "Cherry Picker"
+    - run: git cherry-pick ac2870298ed5b5a96a688d9df07461b31f83e906
+    - run: cmake . -DJSONCPP_WITH_PKGCONFIG_SUPPORT=ON -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF
+    - run: make -j2
+    - run: sudo make install/strip
     - run: ./autogen.sh
     #- run: ./configure --enable-reduce-exports --enable-zmq --enable-glibc-back-compat --with-gui=qt5 LDFLAGS=-static-libstdc++ CPPFLAGS=-DDEBUG_LOCKORDER
     - run: ./configure
     - run: |
         make -j2
         sudo make install # todo: make check /strip
+        sudo ldconfig
     - name: Build project # This would actually build your project, using zip for an example artifact
       run: |
         mkdir -p deploy
