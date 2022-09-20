@@ -71,11 +71,11 @@ jobs:
         restore-keys: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-
     - run: cd ~/ 
     - run: mkdir jsoncpp && cd jsoncpp
+    - run: rm -rf .jsoncpp
+    - run: ls -la
     #- run: git init
     #- run: git remote add origin https://github.com/open-source-parsers/jsoncpp
     - run: git clone -b 1.9.4 https://github.com/open-source-parsers/jsoncpp .
-    - run: rm -rf .jsoncpp
-    - run: ls -la
     #- run: git pull
     #- run: git checkout 1.9.4 -f
     - run: git config user.email "test@example.com"
