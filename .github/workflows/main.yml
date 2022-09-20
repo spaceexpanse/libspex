@@ -58,6 +58,16 @@ jobs:
         #sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libzmq3-dev libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler libqrencode-dev libboost-program-options-dev    
         sudo apt-get install --no-install-recommends --no-upgrade -qq "$APT_BASE" git autoconf autoconf-archive automake cmake git libtool pkg-config libcurl4-openssl-dev libssl-dev libmicrohttpd-dev make
     - run: |
+        cd ~/
+        mkdir jsoncpp && cd jsoncpp
+        git clone -b 1.9.4 https://github.com/open-source-parsers/jsoncpp .
+        git config user.email "test@example.com"
+        git config user.name "Cherry Picker"
+        git cherry-pick ac2870298ed5b5a96a688d9df07461b31f83e906
+        cmake . -DJSONCPP_WITH_PKGCONFIG_SUPPORT=ON -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF
+        make -j4
+        sudo make install/strip
+    - run: |
         cd ~/ 
         git clone https://github.com/cinemast/libjson-rpc-cpp
         cd libjson-rpc-cpp
