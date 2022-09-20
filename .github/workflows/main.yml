@@ -73,14 +73,15 @@ jobs:
     - run: mkdir jsoncpp && cd jsoncpp
     #- run: git init
     #- run: git remote add origin https://github.com/open-source-parsers/jsoncpp
-    - run: git clone -b 1.9.4 https://github.com/open-source-parsers/jsoncpp .jsoncpp
+    - run: git clone -b 1.9.4 https://github.com/open-source-parsers/jsoncpp .
+    - run: rm -rf .jsoncpp
     - run: ls -la
     #- run: git pull
     #- run: git checkout 1.9.4 -f
     - run: git config user.email "test@example.com"
     - run: git config user.name "Cherry Picker"
     - run: git cherry-pick ac2870298ed5b5a96a688d9df07461b31f83e906
-    - run: cmake .jsoncpp -DJSONCPP_WITH_PKGCONFIG_SUPPORT=ON -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF
+    - run: cmake . -DJSONCPP_WITH_PKGCONFIG_SUPPORT=ON -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF
     - run: make -j2
     - run: sudo make install/strip
     - run: ./autogen.sh
