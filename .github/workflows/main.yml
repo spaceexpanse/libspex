@@ -42,7 +42,7 @@ jobs:
       with:
         path: |
           .ccache
-          .spacexpanse-params
+          #.spacexpanse-params
         key: x86_64-unknown-linux-gnu-ccache-${{ env.NOW }} 
         restore-keys: |
             x86_64-unknown-linux-gnu-ccache-
@@ -63,15 +63,15 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: |
-          depends/built
-          depends/work/build
-          depends/sdk-sources
-          depends/x86_64-unknown-linux-gnu          
+          #depends/built
+          #depends/work/build
+          #depends/sdk-sources
+          #depends/x86_64-unknown-linux-gnu          
         key: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-${{ env.NOW }} 
         restore-keys: ubuntu-18.04-depends-x86_64-unknown-linux-gnu-
-    - run: cd ~/
+    #- run: cd ~/
     - run: mkdir jsoncpp && cd jsoncpp
-    - run: git clone -b 1.9.4 https://github.com/open-source-parsers/jsoncpp
+    - run: git clone -b 1.9.4 https://github.com/open-source-parsers/jsoncpp .
     - run: git config user.email "test@example.com"
     - run: git config user.name "Cherry Picker"
     - run: git cherry-pick ac2870298ed5b5a96a688d9df07461b31f83e906
