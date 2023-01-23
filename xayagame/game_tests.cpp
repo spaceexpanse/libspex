@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2022 The Xaya developers
+// Copyright (C) 2018-2023 The Xaya developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -558,7 +558,7 @@ protected:
 
   Game g;
 
-  InitialStateTests()
+  InitialStateTests ()
     : g(GAME_ID)
   {
     EXPECT_CALL (*mockXayaServer, getblockhash (GAME_GENESIS_HEIGHT))
@@ -1300,7 +1300,7 @@ class SyncingTests : public InitialStateTests
 
 protected:
 
-  SyncingTests()
+  SyncingTests ()
   {
     mockXayaServer->SetBestBlock (GAME_GENESIS_HEIGHT,
                                   TestGame::GenesisBlockHash ());
@@ -1550,6 +1550,91 @@ TEST_F (SyncingTests, MissedAttachWhileCatchingUp)
                    Moves ("a2c3"), NO_SEQ_MISMATCH);
   EXPECT_EQ (GetState (g), State::UP_TO_DATE);
   ExpectGameState (BlockHash (12), "a2b1c3");
+}
+
+
+TEST_F (SyncingTests, GameStateUpdatedNotifications)
+{
+  /**
+   * Modified TestGame instance that mocks out GameStateUpdated so we can
+   * use gmock expectations on it.
+   */
+  class : public TestGame
+  {
+  public:
+    MOCK_METHOD2 (GameStateUpdated,
+                  void (const GameStateData& state,
+                        const Json::Value& blockData) override);
+  } r;
+
+  g.SetGameLogic (r);
+  storage.Clear ();
+
+  {
+    InSequence dummy;
+
+    Json::Value genesisBlock(Json::objectValue);
+    genesisBlock["height"] = static_cast<Json::Int64> (GAME_GENESIS_HEIGHT);
+    genesisBlock["hash"] = GAME_GENESIS_HASH;
+    EXPECT_CALL (r, GameStateUpdated ("", genesisBlock)).Times (1);
+
+    Json::Value attachedBlock(Json::objectValue);
+    attachedBlock["height"] = 11u;
+    attachedBlock["hash"] = BlockHash (11).ToHex ();
+    attachedBlock["rngseed"] = BlockHash (11).ToHex ();
+    attachedBlock["parent"] = GAME_GENESIS_HASH;
+    EXPECT_CALL (r, GameStateUpdated ("a0b1", attachedBlock)).Times (1);
+
+    EXPECT_CALL (r, GameStateUpdated ("", genesisBlock)).Times (1);
+  }
+
+  ReinitialiseState (g);
+  EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  ExpectGameState (TestGame::GenesisBlockHash (), "");
+
+  AttachBlock (g, BlockHash (11), Moves ("a0b1"));
+  EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  ExpectGameState (BlockHash (11), "a0b1");
+
+  DetachBlock (g);
+  EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  ExpectGameState (TestGame::GenesisBlockHash (), "");
+}
+
+/* ************************************************************************** */
+
+using TargetBlockTests = SyncingTests;
+
+TEST_F (TargetBlockTests, StopsWhileAttaching)
+{
+  g.SetTargetBlock (BlockHash (12));
+
+  AttachBlock (g, BlockHash (11), Moves ("a0b1"));
+  AttachBlock (g, BlockHash (12), Moves ("a2"));
+  AttachBlock (g, BlockHash (13), Moves ("c3"));
+
+  EXPECT_EQ (GetState (g), State::AT_TARGET);
+  ExpectGameState (BlockHash (12), "a2b1");
+}
+
+TEST_F (TargetBlockTests, StopsWhileDetaching)
+{
+  AttachBlock (g, BlockHash (11), Moves ("a0b1"));
+  AttachBlock (g, BlockHash (12), Moves ("a2"));
+  AttachBlock (g, BlockHash (13), Moves ("c3"));
+
+  EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  ExpectGameState (BlockHash (13), "a2b1c3");
+
+  mockXayaServer->SetBestBlock (13, BlockHash (13));
+  g.SetTargetBlock (BlockHash (12));
+
+  DetachBlock (g);
+  DetachBlock (g);
+  DetachBlock (g);
+
+  EXPECT_EQ (GetState (g), State::AT_TARGET);
+  ExpectGameState (BlockHash (12), "a2b1");
 }
 
 /* ************************************************************************** */
