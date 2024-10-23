@@ -94,6 +94,16 @@ class XayaGameTest (object):
 
     pass
 
+  def gameBaseArgs (self):
+    """
+    This function can be overridden by subclasses.  It should return an array
+    of extra arguments that should (always) be passed to the GSP binary
+    when it is started, in addition to explicitly set "extra args"
+    when starting it.
+    """
+
+    return []
+
   def main (self):
     """
     Executes the testcase, including setup and cleanup.
@@ -242,7 +252,8 @@ class XayaGameTest (object):
     gameCmd = list (self.runGameWith)
     gameCmd.append (gameBinary)
 
-    return game.Node (self.basedir, next (self.ports), gameCmd)
+    return game.Node (self.basedir, next (self.ports),
+                      gameCmd, self.gameBaseArgs ())
 
   ##############################################################################
   # Methods for setting up the base-chain environment.
@@ -311,7 +322,7 @@ class XayaGameTest (object):
   def runXayaXEthEnvironment (self):
     """
     Runs a base-chain environment that uses Xaya X to link to an
-    Ethereum-like test chain (based on Ganache).
+    Ethereum-like test chain.
     """
 
     if self.zmqPending != "one socket":
@@ -322,10 +333,10 @@ class XayaGameTest (object):
     env.enablePending ()
 
     with env.run ():
-      self.ethnode = env.ganache
+      self.ethnode = env.evm
       self.contracts = env.contracts
-      self.rpc.eth = env.createGanacheRpc ()
-      self.w3 = env.ganache.w3
+      self.rpc.eth = env.createEvmRpc ()
+      self.w3 = env.evm.w3
       yield env
 
   ##############################################################################

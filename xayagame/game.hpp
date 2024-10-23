@@ -1,10 +1,11 @@
-// Copyright (C) 2018-2023 The Xaya developers
+// Copyright (C) 2018-2024 The Xaya developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef XAYAGAME_GAME_HPP
 #define XAYAGAME_GAME_HPP
 
+#include "coprocessor.hpp"
 #include "gamelogic.hpp"
 #include "heightcache.hpp"
 #include "mainloop.hpp"
@@ -208,6 +209,9 @@ private:
   /** The background thread running regular connection checks, if any.  */
   std::unique_ptr<ConnectionCheckerThread> connectionChecker;
 
+  /** The coprocessor batch we use to handle coprocessors during blocks.  */
+  CoprocessorBatch coproc;
+
   void BlockAttach (const std::string& id, const Json::Value& data,
                     bool seqMismatch) override;
   void BlockDetach (const std::string& id, const Json::Value& data,
@@ -296,6 +300,28 @@ private:
    * Notifies potentially-waiting threads that the pending state has changed.
    */
   void NotifyPendingStateChange ();
+
+  /**
+   * Constructs a JSON object representing the basic instance state (with
+   * gameid, chain and state) as returned by GetCustomStateData and used
+   * in other places.  Expects the caller to hold the mut lock.
+   *
+   * Returns also the current block hash and height if it can be retrieved.
+   * Might return the hash as null if it cannot be retrieved (e.g. due to
+   * an RPC exception from the blockchain node).
+   */
+  Json::Value UnlockedGetInstanceStateJson (uint256& hash,
+                                            unsigned& height) const;
+
+  /**
+   * Calls the InstanceStateChanged method on rules based on the current
+   * instance state.  Expects the caller to hold the mut lock.
+   *
+   * As an implementation detail / rule, this method gets called from the
+   * place that actually holds the mut lock, and not methods further down
+   * the call stack (which might do the actual changes to "state" for instance).
+   */
+  void NotifyInstanceStateChanged () const;
 
   /**
    * Returns the current pending state as JSON, but assuming that the caller
@@ -411,6 +437,11 @@ public:
    * or disables one (i.e. sync to tip) if the value is null.
    */
   void SetTargetBlock (const uint256& blk);
+
+  /**
+   * Adds a coprocessor to the batch that is updated on each block.
+   */
+  void AddCoprocessor (const std::string& name, Coprocessor& p);
 
   /**
    * Detects the ZMQ endpoint(s) by calling getzmqnotifications on the Xaya

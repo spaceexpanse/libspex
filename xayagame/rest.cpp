@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2022 The Xaya developers
+// Copyright (C) 2019-2023 The Xaya developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -27,6 +27,9 @@ namespace fs = std::experimental::filesystem;
 
 /** Buffer size for IO with temporary files (to use zlib's gzip interface).  */
 constexpr size_t TEMP_BUF_SIZE = 4'096;
+
+/** Default timeout for the REST client.  */
+constexpr auto REST_CLIENT_DEFAULT_TIMEOUT = std::chrono::seconds (10);
 
 /**
  * RAII helper that generates the name for a temporary file and removes the
@@ -330,6 +333,7 @@ RestClient::RestClient (const std::string& url)
   : endpoint(url)
 {
   CHECK_EQ (curl_global_init (CURL_GLOBAL_ALL), 0);
+  SetTimeout (REST_CLIENT_DEFAULT_TIMEOUT);
 }
 
 namespace
@@ -357,25 +361,37 @@ RestClient::Request::Request (const RestClient& c)
   errBuffer.resize (CURL_ERROR_SIZE);
   SetCurlOption (handle, CURLOPT_ERRORBUFFER, errBuffer.data ());
 
-  /* Enforce TLS verification.  */
-  SetCurlOption (handle, CURLOPT_SSL_VERIFYPEER, 1L);
-  SetCurlOption (handle, CURLOPT_SSL_VERIFYHOST, 2L);
-
-  /* Set a CAINFO path if we have an explicit one.  */
-  if (client.caFile.empty ())
+  if (client.tlsVerification)
     {
-      LOG_FIRST_N (WARNING, 1) << "Using default cURL CA bundle";
+      /* Enforce TLS verification.  */
+      SetCurlOption (handle, CURLOPT_SSL_VERIFYPEER, 1L);
+      SetCurlOption (handle, CURLOPT_SSL_VERIFYHOST, 2L);
+
+      /* Set a CAINFO path if we have an explicit one.  */
+      if (client.caFile.empty ())
+        {
+          LOG_FIRST_N (WARNING, 1) << "Using default cURL CA bundle";
+        }
+      else
+        {
+          LOG_FIRST_N (INFO, 1) << "Using CA bundle from " << client.caFile;
+          SetCurlOption (handle, CURLOPT_CAINFO, client.caFile.c_str ());
+          SetCurlOption (handle, CURLOPT_CAPATH, nullptr);
+        }
     }
   else
     {
-      LOG_FIRST_N (INFO, 1) << "Using CA bundle from " << client.caFile;
-      SetCurlOption (handle, CURLOPT_CAINFO, client.caFile.c_str ());
-      SetCurlOption (handle, CURLOPT_CAPATH, nullptr);
+      LOG_FIRST_N (WARNING, 1) << "TLS verification is disabled";
+      SetCurlOption (handle, CURLOPT_SSL_VERIFYPEER, 0L);
+      SetCurlOption (handle, CURLOPT_SSL_VERIFYHOST, 0L);
     }
 
   /* Install our write callback.  */
   SetCurlOption (handle, CURLOPT_WRITEFUNCTION, &WriteCallback);
   SetCurlOption (handle, CURLOPT_WRITEDATA, this);
+
+  /* Make sure we time out instead of waiting indefinitely.  */
+  SetCurlOption (handle, CURLOPT_TIMEOUT_MS, client.timeout.count ());
 }
 
 size_t
@@ -562,7 +578,7 @@ RestClient::Request::ProcessJson ()
       return false;
     }
 
-    return true;
+  return true;
 }
 
 /* ************************************************************************** */

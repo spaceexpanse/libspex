@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2022 The Xaya developers
+// Copyright (C) 2018-2024 The Xaya developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -24,11 +24,11 @@
 
 #include <glog/logging.h>
 
-#include <cstdio>
-#include <cstdlib>
+#include <chrono>
 #include <map>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -90,6 +90,12 @@ protected:
    */
   bool shouldFail = false;
 
+  /**
+   * Make the state update function pause for the given duration, to test
+   * how multiple threads work together in the case of long block updates.
+   */
+  std::chrono::milliseconds blockSleep{0};
+
   void
   GetInitialStateBlock (unsigned& height, std::string& hashHex) const override
   {
@@ -114,6 +120,16 @@ public:
   {
     shouldFail = v;
     LOG (INFO) << "Should fail is now: " << shouldFail;
+  }
+
+  /**
+   * Sets the duration that each state update should take / sleep for.
+   */
+  template<typename Rep, typename Period>
+    void
+    SetBlockSleep (const std::chrono::duration<Rep, Period>& val)
+  {
+    blockSleep = std::chrono::duration_cast<decltype (blockSleep)> (val);
   }
 
   using SQLiteGame::GetCustomStateData;
@@ -184,6 +200,8 @@ protected:
   void
   UpdateState (SQLiteDatabase& db, const Json::Value& blockData) override
   {
+    std::this_thread::sleep_for (blockSleep);
+
     for (const auto& m : blockData["moves"])
       {
         const std::string name = m["name"].asString ();
@@ -361,7 +379,7 @@ InitialiseState (Game& game, SQLiteGame& rules)
 {
   unsigned height;
   std::string hashHex;
-  const GameStateData state = rules.GetInitialState (height, hashHex);
+  const GameStateData state = rules.GetInitialState (height, hashHex, nullptr);
 
   uint256 hash;
   ASSERT_TRUE (hash.FromHex (hashHex));
@@ -394,9 +412,9 @@ protected:
    * Initialises the Game instance and related things.
    */
   void
-  InitialiseGame ()
+  InitialiseGame (const std::string& dbFile)
   {
-    rules.Initialise (":memory:");
+    rules.Initialise (dbFile);
     rules.InitialiseGameContext (Chain::MAIN, GAME_ID, nullptr);
 
     SetStartingBlock (GENESIS_HEIGHT, GenesisHash ());
@@ -435,7 +453,7 @@ protected:
 
   SQLiteGameTests ()
   {
-    InitialiseGame ();
+    InitialiseGame (":memory:");
     InitialiseState (game, rules);
   }
 
@@ -450,7 +468,7 @@ protected:
 
   StateInitialisationTests ()
   {
-    InitialiseGame ();
+    InitialiseGame (":memory:");
   }
 
 };
@@ -461,7 +479,7 @@ TEST_F (StateInitialisationTests, HeightAndHash)
 
   unsigned height;
   std::string hashHex;
-  const GameStateData state = rules.GetInitialState (height, hashHex);
+  const GameStateData state = rules.GetInitialState (height, hashHex, nullptr);
   EXPECT_EQ (height, GENESIS_HEIGHT);
   EXPECT_EQ (hashHex, GenesisHash ().ToHex ());
 }
@@ -754,21 +772,81 @@ TEST_F (SchemaVersionTests, VersionSet)
 
 /* ************************************************************************** */
 
+/**
+ * Helper class that is essentially SQLiteHasher, except that it has a
+ * configurable delay in the Compute() routine, so we can test async
+ * processing.
+ */
+class DelayedHasher : public SQLiteHasher
+{
+
+private:
+
+  /** The delay added in Compute().  */
+  std::chrono::milliseconds delay{0};
+
+protected:
+
+  void
+  Compute (const Json::Value& blockData, const SQLiteDatabase& db) override
+  {
+    std::this_thread::sleep_for (delay);
+    SQLiteHasher::Compute (blockData, db);
+  }
+
+public:
+
+  using SQLiteHasher::SQLiteHasher;
+
+  /**
+   * Sets the delay to apply in Compute().  The delay is applied before
+   * the actual computation takes place.
+   */
+  void
+  SetDelay (const std::chrono::milliseconds d)
+  {
+    delay = d;
+  }
+
+};
+
 class SQLiteGameHashingTests : public UninitialisedSQLiteGameTests<ChatGame>
 {
+
+private:
+
+  /** The temporary file used for the database.  */
+  TempFileName file;
 
 protected:
 
   using UninitialisedSQLiteGameTests<ChatGame>::game;
   using UninitialisedSQLiteGameTests<ChatGame>::rules;
 
-  SQLiteHasher hasher;
+  DelayedHasher hasher;
 
   SQLiteGameHashingTests ()
   {
     rules.AddProcessor (hasher);
+  }
 
-    InitialiseGame ();
+  ~SQLiteGameHashingTests ()
+  {
+    hasher.Finish (rules.GetDatabaseForTesting ());
+  }
+
+  /**
+   * Sets up the game and storage, either using an in-memory database
+   * (if async is false) or a temporary file on disk for async testing
+   * (so we can use database snapshots).
+   */
+  void
+  SetUp (const bool async)
+  {
+    if (async)
+      InitialiseGame (file.GetName ());
+    else
+      InitialiseGame (":memory:");
     InitialiseState (game, rules);
   }
 
@@ -800,6 +878,7 @@ protected:
 
 TEST_F (SQLiteGameHashingTests, AttachingBlocks)
 {
+  SetUp (false);
   hasher.SetInterval (2);
 
   AttachBlock (game, BlockHash (11), ChatGame::Moves ({
@@ -826,6 +905,7 @@ TEST_F (SQLiteGameHashingTests, AttachingBlocks)
 
 TEST_F (SQLiteGameHashingTests, Reorg)
 {
+  SetUp (false);
   hasher.SetInterval (1);
 
   AttachBlock (game, BlockHash (11), ChatGame::Moves ({
@@ -861,6 +941,38 @@ TEST_F (SQLiteGameHashingTests, Reorg)
   EXPECT_EQ (GetStoredHash (BlockHash (42)), hash2);
 }
 
+TEST_F (SQLiteGameHashingTests, AsyncProcessing)
+{
+  using Clock = std::chrono::steady_clock;
+
+  constexpr auto DELAY = std::chrono::milliseconds (100);
+  SetUp (true);
+  hasher.SetInterval (3);
+  hasher.SetDelay (DELAY);
+
+  /* Attaching block 12 will start an async hashing process, which
+     should return the correct value when done even if we modify the
+     database in the mean time with block 13.  Attaching block 13 should
+     be possible before the processing is done.  */
+  AttachBlock (game, BlockHash (11), ChatGame::Moves ({}));
+  const auto before = Clock::now ();
+  AttachBlock (game, BlockHash (12), ChatGame::Moves ({
+    {"domob", "foo"},
+  }));
+  const auto hash12 = GetDatabaseHash ();
+  AttachBlock (game, BlockHash (13), ChatGame::Moves ({
+    {"domob", "bar"},
+  }));
+  const auto after = Clock::now ();
+  EXPECT_LT (after - before, DELAY / 2);
+
+  /* Wait for the process to finish and check the hash.  */
+  EXPECT_TRUE (GetStoredHash (BlockHash (12)).IsNull ());
+  std::this_thread::sleep_for (2 * DELAY);
+  AttachBlock (game, BlockHash (14), ChatGame::Moves ({}));
+  EXPECT_EQ (GetStoredHash (BlockHash (12)), hash12);
+}
+
 /* ************************************************************************** */
 
 class PersistenceTests : public GameTestWithBlockchain
@@ -868,8 +980,8 @@ class PersistenceTests : public GameTestWithBlockchain
 
 private:
 
-  /** The filename of the temporary on-disk database.  */
-  std::string filename;
+  /** The temporary file used for the database.  */
+  TempFileName file;
 
 protected:
 
@@ -886,8 +998,7 @@ protected:
     : GameTestWithBlockchain(GAME_ID),
       game(GAME_ID)
   {
-    filename = std::tmpnam (nullptr);
-    LOG (INFO) << "Using temporary database file: " << filename;
+    LOG (INFO) << "Using temporary database file: " << file.GetName ();
 
     CreateChatGame (false);
 
@@ -898,10 +1009,8 @@ protected:
 
   ~PersistenceTests ()
   {
+    /* Explicitly clear the game instance before the temporary file.  */
     rules.reset ();
-
-    LOG (INFO) << "Cleaning up temporary file: " << filename;
-    std::remove (filename.c_str ());
   }
 
   /**
@@ -914,7 +1023,7 @@ protected:
     rules = std::make_unique<ChatGame> ();
     rules->SetMessForDebug (mess);
 
-    rules->Initialise (filename);
+    rules->Initialise (file.GetName ());
     rules->InitialiseGameContext (Chain::MAIN, GAME_ID, nullptr);
 
     game.SetStorage (rules->GetStorage ());
@@ -1087,6 +1196,36 @@ TEST_F (UnblockedStateExtractionTests, UncommittedChanges)
   EXPECT_EQ (GetLastMessage ("domob", 1), "new");
 }
 
+TEST_F (UnblockedStateExtractionTests, LongBlockUpdate)
+{
+  rules->SetBlockSleep (std::chrono::milliseconds (100));
+
+  std::atomic<bool> updStarted;
+  std::atomic<bool> updDone;
+  updStarted = false;
+  updDone = false;
+
+  std::thread upd([&] ()
+    {
+      updStarted = true;
+      LOG (INFO) << "Long block update started";
+      AttachBlock (game, BlockHash (12), ChatGame::Moves ({{"domob", "new"}}));
+      LOG (INFO) << "Long block update done";
+      updDone = true;
+    });
+
+  while (!updStarted)
+    std::this_thread::sleep_for (std::chrono::milliseconds (1));
+
+  LOG (INFO) << "Starting state read";
+  EXPECT_EQ (GetLastMessage ("domob", 1), "old");
+  LOG (INFO) << "State read done";
+
+  EXPECT_FALSE (updDone);
+  upd.join ();
+  EXPECT_EQ (GetLastMessage ("domob", 1), "new");
+}
+
 /* ************************************************************************** */
 
 /**
@@ -1170,6 +1309,8 @@ protected:
   void
   UpdateState (SQLiteDatabase& db, const Json::Value& blockData) override
   {
+    std::this_thread::sleep_for (blockSleep);
+
     for (const auto& m : blockData["moves"])
       {
         const std::string name = m["name"].asString ();

@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2023 The Xaya developers
+// Copyright (C) 2018-2024 The Xaya developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -177,6 +177,11 @@ private:
    */
   std::string genesisHash = GAME_GENESIS_HASH;
 
+  /** Mutex locking lastInstanceState.  */
+  mutable std::mutex mutInstanceState;
+  /** The last state passed to the InstanceStateChanged() notification.  */
+  Json::Value lastInstanceState;
+
   /**
    * Parses a string of the game state / undo format into a map holding
    * the name/value pairs.
@@ -284,6 +289,23 @@ public:
     Json::Value res(Json::objectValue);
     res["state"] = state;
     return res;
+  }
+
+  void
+  InstanceStateChanged (const Json::Value& state) override
+  {
+    std::lock_guard<std::mutex> lock(mutInstanceState);
+    lastInstanceState = state;
+  }
+
+  Json::Value
+  GetLastInstanceState () const
+  {
+    std::lock_guard<std::mutex> lock(mutInstanceState);
+    /* Return a copy (by value) on purpose to make sure the caller can then
+       use the object without worrying about race conditions and other
+       threads / locking.  */
+    return lastInstanceState;
   }
 
   void
@@ -640,10 +662,13 @@ TEST_F (InitialStateTests, WaitingForGenesis)
   SetStartingBlock (8, BlockHash (8));
   AttachBlock (g, BlockHash (9), emptyMoves);
   EXPECT_EQ (GetState (g), State::PREGENESIS);
+  EXPECT_EQ (rules.GetLastInstanceState ()["state"].asString (), "pregenesis");
 
   mockXayaServer->SetBestBlock (10, TestGame::GenesisBlockHash ());
   AttachBlock (g, TestGame::GenesisBlockHash (), emptyMoves);
   EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  EXPECT_EQ (rules.GetLastInstanceState ()["state"].asString (), "up-to-date");
+  EXPECT_EQ (rules.GetLastInstanceState ()["height"].asInt64 (), 10);
   ExpectInitialStateInStorage ();
 }
 
@@ -1346,18 +1371,22 @@ TEST_F (SyncingTests, UpToDateOperation)
 {
   AttachBlock (g, BlockHash (11), Moves ("a0b1"));
   EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  EXPECT_EQ (rules.GetLastInstanceState ()["height"].asInt64 (), 11);
   ExpectGameState (BlockHash (11), "a0b1");
 
   AttachBlock (g, BlockHash (12), Moves ("a2c3"));
   EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  EXPECT_EQ (rules.GetLastInstanceState ()["height"].asInt64 (), 12);
   ExpectGameState (BlockHash (12), "a2b1c3");
 
   DetachBlock (g);
   EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  EXPECT_EQ (rules.GetLastInstanceState ()["height"].asInt64 (), 11);
   ExpectGameState (BlockHash (11), "a0b1");
 
   DetachBlock (g);
   EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  EXPECT_EQ (rules.GetLastInstanceState ()["height"].asInt64 (), 10);
   ExpectGameState (TestGame::GenesisBlockHash (), "");
 }
 
@@ -1607,7 +1636,7 @@ using TargetBlockTests = SyncingTests;
 
 TEST_F (TargetBlockTests, StopsWhileAttaching)
 {
-  g.SetTargetBlock (BlockHash (12));
+  SetTargetBlock (g, BlockHash (12));
 
   AttachBlock (g, BlockHash (11), Moves ("a0b1"));
   AttachBlock (g, BlockHash (12), Moves ("a2"));
@@ -1627,7 +1656,7 @@ TEST_F (TargetBlockTests, StopsWhileDetaching)
   ExpectGameState (BlockHash (13), "a2b1c3");
 
   mockXayaServer->SetBestBlock (13, BlockHash (13));
-  g.SetTargetBlock (BlockHash (12));
+  SetTargetBlock (g, BlockHash (12));
 
   DetachBlock (g);
   DetachBlock (g);
@@ -1635,6 +1664,231 @@ TEST_F (TargetBlockTests, StopsWhileDetaching)
 
   EXPECT_EQ (GetState (g), State::AT_TARGET);
   ExpectGameState (BlockHash (12), "a2b1");
+}
+
+TEST_F (TargetBlockTests, AtTargetWhileSetting)
+{
+  AttachBlock (g, BlockHash (11), Moves ("a0b1"));
+  AttachBlock (g, BlockHash (12), Moves ("a2"));
+
+  EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  EXPECT_EQ (rules.GetLastInstanceState ()["state"].asString (), "up-to-date");
+
+  /* Use the publicly exposed method rather than the internal one to ensure
+     that all the logic there (in particular, notifying about the state
+     change) is executed.  */
+  g.SetTargetBlock (BlockHash (12));
+
+  EXPECT_EQ (GetState (g), State::AT_TARGET);
+  EXPECT_EQ (rules.GetLastInstanceState ()["state"].asString (), "at-target");
+}
+
+/* ************************************************************************** */
+
+/**
+ * A basic coprocessor, which just records all actions seen (initial state,
+ * forward, backward) in memory (when those get committed).  It also verifies
+ * that the block hashes seen match the test block hashes (and records just
+ * the heights for simplicity).
+ */
+class GameTestCoprocessor : public Coprocessor
+{
+
+public:
+
+  /**
+   * A recorded (or expected) operation.
+   */
+  struct Record
+  {
+
+    Coprocessor::Op op;
+    uint64_t height;
+
+    friend bool
+    operator== (const Record& a, const Record& b)
+    {
+      return a.op == b.op && a.height == b.height;
+    }
+
+    friend bool
+    operator!= (const Record& a, const Record& b)
+    {
+      return !(a == b);
+    }
+
+  };
+
+private:
+
+  /** The records saved.  */
+  std::vector<Record> records;
+
+public:
+
+  class TestBlock;
+
+  GameTestCoprocessor () = default;
+
+  /**
+   * Expects that the records match.
+   */
+  void
+  ExpectRecords (const std::vector<Record>& expected) const
+  {
+    EXPECT_EQ (records, expected);
+  }
+
+  std::unique_ptr<Block> ForBlock (const Json::Value& blockData,
+                                   Op op) override;
+
+};
+
+class GameTestCoprocessor::TestBlock : public Coprocessor::Block
+{
+
+private:
+
+  /** The coprocessor this is attached to, so it can record there.  */
+  GameTestCoprocessor& parent;
+
+  /**
+   * To mimic a more "realistic" setting similar to how coprocessors will be
+   * used in a real game, we let the GameLogic actually call into this
+   * instance to initiate saving of the record.  For this a flag is enough,
+   * since the actual data is present on the Block already.
+   */
+  bool write = false;
+
+protected:
+
+  void
+  Commit () override
+  {
+    if (!write)
+      {
+        LOG (ERROR) << "Commit() called but 'write' on TestBlock is false";
+        return;
+      }
+
+    if (GetBlockHeight () == GAME_GENESIS_HEIGHT)
+      EXPECT_EQ (GetBlockHash (), TestGame::GenesisBlockHash ());
+    else
+      EXPECT_EQ (GetBlockHash (), BlockHash (GetBlockHeight ()));
+
+    parent.records.push_back ({GetOperation (), GetBlockHeight ()});
+  }
+
+public:
+
+  TestBlock (const Json::Value& blockData, const Coprocessor::Op o,
+             GameTestCoprocessor& p)
+    : Block(blockData, o), parent(p)
+  {}
+
+  /**
+   * Signals this instance to write a record if Commit() is called.
+   */
+  void
+  WriteRecord ()
+  {
+    write = true;
+  }
+
+};
+
+std::unique_ptr<Coprocessor::Block>
+GameTestCoprocessor::ForBlock (const Json::Value& blockData, const Op op)
+{
+  return std::make_unique<TestBlock> (blockData, op, *this);
+}
+
+/**
+ * Subclass of TestGame that calls into the coprocessor (if it is available).
+ */
+class CoprocessorTestGame : public TestGame
+{
+
+private:
+
+  /**
+   * Gets the coprocessor from the context, and if it is set,
+   * calls WriteRecord on it.
+   */
+  void
+  WriteRecord ()
+  {
+    ASSERT_EQ (
+        GetContext ().GetCoprocessor<GameTestCoprocessor::TestBlock> ("foo"),
+        nullptr);
+    auto* coproc
+        = GetContext ().GetCoprocessor<GameTestCoprocessor::TestBlock> ("test");
+    if (coproc != nullptr)
+      coproc->WriteRecord ();
+  }
+
+protected:
+
+  GameStateData
+  GetInitialStateInternal (unsigned& height, std::string& hashHex) override
+  {
+    WriteRecord ();
+    return TestGame::GetInitialStateInternal (height, hashHex);
+  }
+
+  GameStateData
+  ProcessForwardInternal (const GameStateData& oldState,
+                          const Json::Value& blockData,
+                          UndoData& undoData) override
+  {
+    WriteRecord ();
+    return TestGame::ProcessForwardInternal (oldState, blockData, undoData);
+  }
+
+  GameStateData
+  ProcessBackwardsInternal (const GameStateData& newState,
+                            const Json::Value& blockData,
+                            const UndoData& undoData) override
+  {
+    WriteRecord ();
+    return TestGame::ProcessBackwardsInternal (newState, blockData, undoData);
+  }
+
+};
+
+class GameCoprocessorTests : public SyncingTests
+{
+
+protected:
+
+  /** The coprocessor used.  */
+  GameTestCoprocessor coproc;
+
+  /** The modified test game.  */
+  CoprocessorTestGame rules;
+
+  GameCoprocessorTests ()
+  {
+    g.AddCoprocessor ("test", coproc);
+    g.SetGameLogic (rules);
+    storage.Clear ();
+    ReinitialiseState (g);
+  }
+
+};
+
+TEST_F (GameCoprocessorTests, CoprocessorCalled)
+{
+  AttachBlock (g, BlockHash (11), Moves ("a0b1"));
+  AttachBlock (g, BlockHash (12), Moves ("a2c3"));
+  DetachBlock (g);
+
+  coproc.ExpectRecords ({
+    {Coprocessor::Op::INITIALISATION, GAME_GENESIS_HEIGHT},
+    {Coprocessor::Op::FORWARD, 11},
+    {Coprocessor::Op::FORWARD, 12},
+    {Coprocessor::Op::BACKWARD, 12},
+  });
 }
 
 /* ************************************************************************** */
@@ -2083,6 +2337,11 @@ TEST_F (GameStorageRetryTests, InitialState)
 
 TEST_F (GameStorageRetryTests, AttachBlock)
 {
+  Json::Value mockHeader(Json::objectValue);
+  mockHeader["height"] = GAME_GENESIS_HEIGHT;
+  EXPECT_CALL (*mockXayaServer, getblockheader (GAME_GENESIS_HASH))
+      .WillRepeatedly (Return (mockHeader));
+
   EXPECT_CALL (*mockXayaServer, game_sendupdates (GAME_GENESIS_HASH, GAME_ID))
       .WillOnce (Return (SendupdatesResponse (BlockHash (11), "reqtoken")));
   mockXayaServer->SetBestBlock (11, BlockHash (11));
@@ -2105,6 +2364,11 @@ TEST_F (GameStorageRetryTests, AttachBlock)
 
 TEST_F (GameStorageRetryTests, DetachBlock)
 {
+  Json::Value mockHeader(Json::objectValue);
+  mockHeader["height"] = 11;
+  EXPECT_CALL (*mockXayaServer, getblockheader (BlockHash (11).ToHex ()))
+      .WillRepeatedly (Return (mockHeader));
+
   EXPECT_CALL (*mockXayaServer,
                game_sendupdates (BlockHash (11).ToHex (), GAME_ID))
       .WillOnce (Return (SendupdatesResponse (TestGame::GenesisBlockHash (),
@@ -2218,10 +2482,13 @@ TEST_F (GameProbeAndFixConnectionTests, DisconnectAndReconnect)
   std::this_thread::sleep_for (2 * MAX_STALENESS);
   ProbeAndFix ();
   EXPECT_EQ (GetState (g), State::DISCONNECTED);
+  EXPECT_EQ (rules.GetLastInstanceState ()["state"].asString (),
+             "disconnected");
   EXPECT_FALSE (GameTestFixture::GetZmq (g).IsRunning ());
 
   ProbeAndFix ();
   EXPECT_EQ (GetState (g), State::UP_TO_DATE);
+  EXPECT_EQ (rules.GetLastInstanceState ()["state"].asString (), "up-to-date");
   EXPECT_TRUE (GameTestFixture::GetZmq (g).IsRunning ());
 }
 

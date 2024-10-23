@@ -1,8 +1,10 @@
-// Copyright (C) 2018-2023 The Xaya developers
+// Copyright (C) 2018-2024 The Xaya developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "game.hpp"
+
+#include "perftimer.hpp"
 
 #include <jsonrpccpp/common/errors.h>
 #include <jsonrpccpp/common/exception.h>
@@ -10,7 +12,6 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include <chrono>
 #include <sstream>
 #include <thread>
 
@@ -37,21 +38,16 @@ DEFINE_int32 (xaya_zmq_staleness_ms, 120'000,
 DEFINE_int32 (xaya_connection_check_ms, 0,
               "if non-zero, interval between connection checks");
 
+/**
+ * If set to true, crash (CHECK-fail) when a block detach happens beyond
+ * pruning depth instead of resetting and syncing from scratch.
+ */
+DEFINE_bool (xaya_crash_without_undo, false,
+             "if true, crash instead of syncing from scratch for a reorg"
+             " beyond pruning depth");
+
 namespace xaya
 {
-
-namespace
-{
-
-/** Clock used for timing the callbacks.  */
-using PerformanceTimer = std::chrono::high_resolution_clock;
-
-/** Duration type used for reporting callback timings.  */
-using CallbackDuration = std::chrono::microseconds;
-/** Unit (as string) for the callback timings.  */
-constexpr const char* CALLBACK_DURATION_UNIT = "us";
-
-} // anonymous namespace
 
 /* ************************************************************************** */
 
@@ -180,19 +176,22 @@ Game::UpdateStateForAttach (const uint256& parent, const uint256& hash,
   {
     internal::ActiveTransaction tx(transactionManager);
 
+    CoprocessorBatch::Block coprocBlk(coproc, blockHeader,
+                                      Coprocessor::Op::FORWARD);
+    coprocBlk.Begin ();
+
     UndoData undo;
-    const auto start = PerformanceTimer::now ();
+    PerformanceTimer timer;
     const GameStateData newState
-        = rules->ProcessForward (oldState, blockData, undo);
-    const auto end = PerformanceTimer::now ();
+        = rules->ProcessForward (oldState, blockData, undo, &coprocBlk);
+    timer.Stop ();
     LOG (INFO)
-        << "Processing block " << height << " forward took "
-        << std::chrono::duration_cast<CallbackDuration> (end - start).count ()
-        << " " << CALLBACK_DURATION_UNIT;
+        << "Processing block " << height << " forward took " << timer;
 
     storage->AddUndoData (hash, height, undo);
     storage->SetCurrentGameStateWithHeight (hash, height, newState);
 
+    coprocBlk.Commit ();
     tx.Commit ();
     rules->GameStateUpdated (newState, blockHeader);
   }
@@ -226,6 +225,9 @@ Game::UpdateStateForDetach (const uint256& parent, const uint256& hash,
           << "Failed to retrieve undo data for block " << hash.ToHex ()
           << ".  Need to resync from scratch.";
       transactionManager.TryAbortTransaction ();
+      CHECK (!FLAGS_xaya_crash_without_undo)
+          << "Block " << hash.ToHex ()
+          << " is being detached without undo data";
       storage->Clear ();
       return false;
     }
@@ -235,32 +237,36 @@ Game::UpdateStateForDetach (const uint256& parent, const uint256& hash,
   {
     internal::ActiveTransaction tx(transactionManager);
 
-    const auto start = PerformanceTimer::now ();
-    const GameStateData oldState
-        = rules->ProcessBackwards (newState, blockData, undo);
-    const auto end = PerformanceTimer::now ();
-
     CHECK (blockData.isObject ());
     const auto& blockHeader = blockData["block"];
     CHECK (blockHeader.isObject ());
     const unsigned height = blockHeader["height"].asUInt ();
     CHECK_GT (height, 0);
 
+    /* Note that here (unlike GameStateUpdated below), we want to pass the block
+       that is being undone, not the new best block (its parent).  */
+    CoprocessorBatch::Block coprocBlk(coproc, blockHeader,
+                                      Coprocessor::Op::BACKWARD);
+    coprocBlk.Begin ();
+
+    PerformanceTimer timer;
+    const GameStateData oldState
+        = rules->ProcessBackwards (newState, blockData, undo, &coprocBlk);
+    timer.Stop ();
     LOG (INFO)
-        << "Undoing block " << height << " took "
-        << std::chrono::duration_cast<CallbackDuration> (end - start).count ()
-        << " " << CALLBACK_DURATION_UNIT;
+        << "Undoing block " << height << " took " << timer;
 
     storage->SetCurrentGameStateWithHeight (parent, height - 1, oldState);
     storage->ReleaseUndoData (hash);
-
-    tx.Commit ();
 
     /* The new state's block data is not directly known, but we can conclude
        some information about it.  */
     Json::Value stateBlockHeader(Json::objectValue);
     stateBlockHeader["height"] = static_cast<Json::Int64> (height - 1);
     stateBlockHeader["hash"] = parent.ToHex ();
+
+    coprocBlk.Commit ();
+    tx.Commit ();
     rules->GameStateUpdated (oldState, stateBlockHeader);
   }
 
@@ -315,6 +321,7 @@ Game::BlockAttach (const std::string& id, const Json::Value& data,
       ReinitialiseState ();
       if (pruningQueue != nullptr)
         pruningQueue->Reset ();
+      NotifyInstanceStateChanged ();
       return;
     }
 
@@ -396,6 +403,8 @@ Game::BlockAttach (const std::string& id, const Json::Value& data,
       pending->ProcessAttachedBlock (storage->GetCurrentGameState (), data);
       NotifyPendingStateChange ();
     }
+
+  NotifyInstanceStateChanged ();
 }
 
 void
@@ -428,6 +437,7 @@ Game::BlockDetach (const std::string& id, const Json::Value& data,
       ReinitialiseState ();
       if (pruningQueue != nullptr)
         pruningQueue->Reset ();
+      NotifyInstanceStateChanged ();
       return;
     }
 
@@ -511,6 +521,8 @@ Game::BlockDetach (const std::string& id, const Json::Value& data,
       pending->ProcessDetachedBlock (storage->GetCurrentGameState (), data);
       NotifyPendingStateChange ();
     }
+
+  NotifyInstanceStateChanged ();
 }
 
 void
@@ -541,6 +553,7 @@ Game::HasStopped ()
   std::lock_guard<std::mutex> lock(mut);
   state = State::DISCONNECTED;
   LOG (INFO) << "ZMQ subscriber has stopped listening";
+  NotifyInstanceStateChanged ();
 }
 
 void
@@ -676,7 +689,16 @@ Game::SetTargetBlock (const uint256& blk)
   targetBlock = blk;
 
   if (state != State::DISCONNECTED)
-    ReinitialiseState ();
+    {
+      ReinitialiseState ();
+      NotifyInstanceStateChanged ();
+    }
+}
+
+void
+Game::AddCoprocessor (const std::string& name, Coprocessor& p)
+{
+  coproc.Add (name, p);
 }
 
 bool
@@ -727,19 +749,12 @@ Game::DetectZmqEndpoint ()
 }
 
 Json::Value
-Game::GetCustomStateData (
-    const std::string& jsonField,
-    const ExtractJsonFromStateWithLock& cb) const
+Game::UnlockedGetInstanceStateJson (uint256& hash, unsigned& height) const
 {
-  std::unique_lock<std::mutex> lock(mut);
-
   Json::Value res(Json::objectValue);
   res["gameid"] = gameId;
   res["chain"] = ChainToString (chain);
   res["state"] = StateToString (state);
-
-  uint256 hash;
-  unsigned height;
 
   /* Getting the height for the hash value might throw, if we revert
      back to Xaya RPC and that is down.  We want to handle this case
@@ -749,16 +764,47 @@ Game::GetCustomStateData (
   try
     {
       if (!storage->GetCurrentBlockHashWithHeight (hash, height))
-        return res;
+        {
+          hash.SetNull ();
+          return res;
+        }
     }
   catch (const std::exception& exc)
     {
       LOG (ERROR) << "Exception getting block hash and height: " << exc.what ();
+      hash.SetNull ();
       return res;
     }
 
+  CHECK (!hash.IsNull ());
   res["blockhash"] = hash.ToHex ();
   res["height"] = height;
+
+  return res;
+}
+
+void
+Game::NotifyInstanceStateChanged () const
+{
+  uint256 hash;
+  unsigned height;
+  const auto state = UnlockedGetInstanceStateJson (hash, height);
+  rules->InstanceStateChanged (state);
+}
+
+Json::Value
+Game::GetCustomStateData (
+    const std::string& jsonField,
+    const ExtractJsonFromStateWithLock& cb) const
+{
+  std::unique_lock<std::mutex> lock(mut);
+
+  uint256 hash;
+  unsigned height;
+  auto res = UnlockedGetInstanceStateJson (hash, height);
+
+  if (hash.IsNull ())
+    return res;
 
   const GameStateData gameState = storage->GetCurrentGameState ();
   res[jsonField] = cb (gameState, hash, height, std::move (lock));
@@ -978,6 +1024,7 @@ Game::ConnectToZmq ()
 
   std::lock_guard<std::mutex> lock(mut);
   ReinitialiseState ();
+  NotifyInstanceStateChanged ();
 }
 
 void
@@ -1030,22 +1077,27 @@ Game::SyncFromCurrentState (const Json::Value& blockchainInfo,
     {
       LOG (INFO) << "Game state matches sync target";
       state = State::AT_TARGET;
-      return;
-    }
-
-  uint256 daemonBestHash;
-  CHECK (daemonBestHash.FromHex (blockchainInfo["bestblockhash"].asString ()));
-
-  if (daemonBestHash == currentHash)
-    {
-      LOG (INFO) << "Game state matches current tip, we are up-to-date";
-      state = State::UP_TO_DATE;
       transactionManager.SetBatchSize (1);
       return;
     }
 
+  if (targetBlock.IsNull ())
+    {
+      const std::string bestHash = blockchainInfo["bestblockhash"].asString ();
+      uint256 daemonBestHash;
+      CHECK (daemonBestHash.FromHex (bestHash));
+      if (daemonBestHash == currentHash)
+        {
+          LOG (INFO) << "Game state matches current tip, we are up-to-date";
+          state = State::UP_TO_DATE;
+          transactionManager.SetBatchSize (1);
+          return;
+        }
+    }
+
   LOG (INFO)
-      << "Game state does not match current tip, requesting updates from "
+      << "Game state does not match current tip or target,"
+         " requesting updates from "
       << currentHash.ToHex ();
   /* At this point, mut is locked.  This means that even if game_sendupdates
      pushes ZMQ notifications before returning from the RPC, the ZMQ thread
@@ -1053,13 +1105,32 @@ Game::SyncFromCurrentState (const Json::Value& blockchainInfo,
      once game_sendupdates and the code here are done.  This ensures that
      we won't ignore ZMQ messages that we just requested simply because we
      are not yet aware of the associated reqtoken.  */
-  /* FIXME:  If we have a sync target block, we should pass it as explicit
-     "to" block here.  For now, though, this is not supported by Xaya X,
-     so don't do that.  This means that a target block only works by
-     stopping at it, not to "explicitly" force sync including a reorg back
-     to the desired block.  */
-  const Json::Value upd
-      = rpcClient->game_sendupdates (currentHash.ToHex (), gameId);
+  Json::Value upd;
+  {
+    Json::Value params;
+    params["fromblock"] = currentHash.ToHex ();
+    params["gameid"] = gameId;
+    if (!targetBlock.IsNull ())
+      params["toblock"] = targetBlock.ToHex ();
+    upd = rpcClient->CallMethod ("game_sendupdates", params);
+    if (!upd.isObject ())
+      throw jsonrpc::JsonRpcException (
+          jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE,
+          upd.toStyledString ());
+  }
+
+  /* If an error is returned, such as when Xaya X is not yet synced to
+     our "fromblock", reset the ZMQ connection so it gets restored and
+     the sync retried later.  */
+  const auto errValue = upd["error"];
+  if (errValue.isBool () && errValue.asBool ())
+    {
+      LOG (ERROR)
+          << "Game blocks update request returned error,"
+          << " resetting ZMQ connection...";
+      zmq.RequestStop ();
+      return;
+    }
 
   LOG (INFO)
       << "Retrieving " << upd["steps"]["detach"].asInt () << " detach and "
@@ -1107,7 +1178,7 @@ Game::ReinitialiseState ()
 
       std::string genesisHashHex;
       unsigned genesisHeightFromGame;
-      rules->GetInitialState (genesisHeightFromGame, genesisHashHex);
+      rules->GetInitialState (genesisHeightFromGame, genesisHashHex, nullptr);
       genesisHeight = genesisHeightFromGame;
       LOG (INFO) << "Got genesis height from game: " << genesisHeight;
     }
@@ -1133,15 +1204,25 @@ Game::ReinitialiseState ()
   transactionManager.TryAbortTransaction ();
   storage->Clear ();
 
-  std::string genesisHashHex;
-  unsigned genesisHeightDummy;
-  const GameStateData genesisData
-      = rules->GetInitialState (genesisHeightDummy, genesisHashHex);
-  CHECK_EQ (genesisHeight, genesisHeightDummy);
-
   const std::string blockHashHex = rpcClient->getblockhash (genesisHeight);
   uint256 blockHash;
   CHECK (blockHash.FromHex (blockHashHex));
+
+  Json::Value stateBlockHeader(Json::objectValue);
+  stateBlockHeader["height"] = static_cast<Json::Int64> (genesisHeight);
+  stateBlockHeader["hash"] = blockHash.ToHex ();
+
+  /* The coprocessor batch is started before we call GetInitialState, which
+     will be able to access coprocessors from the Context.  */
+  CoprocessorBatch::Block coprocBlk(coproc, stateBlockHeader,
+                                    Coprocessor::Op::INITIALISATION);
+  coprocBlk.Begin ();
+
+  std::string genesisHashHex;
+  unsigned genesisHeightDummy;
+  const GameStateData genesisData
+      = rules->GetInitialState (genesisHeightDummy, genesisHashHex, &coprocBlk);
+  CHECK_EQ (genesisHeight, genesisHeightDummy);
 
   if (genesisHashHex.empty ())
     {
@@ -1161,13 +1242,12 @@ Game::ReinitialiseState ()
     try
       {
         internal::ActiveTransaction tx(transactionManager);
+
         storage->SetCurrentGameStateWithHeight (genesisHash, genesisHeight,
                                                 genesisData);
-        tx.Commit ();
 
-        Json::Value stateBlockHeader(Json::objectValue);
-        stateBlockHeader["height"] = static_cast<Json::Int64> (genesisHeight);
-        stateBlockHeader["hash"] = genesisHash.ToHex ();
+        coprocBlk.Commit ();
+        tx.Commit ();
         rules->GameStateUpdated (genesisData, stateBlockHeader);
 
         break;

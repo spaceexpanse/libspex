@@ -1,4 +1,4 @@
-// Copyright (C) 2018-2022 The Xaya developers
+// Copyright (C) 2018-2023 The Xaya developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -223,6 +223,9 @@ private:
    */
   CachedStatement* entry = nullptr;
 
+  /** Number of times the statement has been stepped already.  */
+  unsigned steps = 0;
+
   /**
    * Constructs a statement instance based on the cache entry.  The entry's
    * used flag must already be set by the caller, but will be cleared after this
@@ -278,6 +281,11 @@ public:
    * Resets the statement without clearing the parameter bindings.
    */
   void Reset ();
+
+  /**
+   * Returns the original SQL statement as a string (for debugging/logging).
+   */
+  std::string GetSql () const;
 
   /**
    * Binds a numbered parameter to NULL.
@@ -375,11 +383,6 @@ private:
   void OpenDatabase ();
 
   /**
-   * Blocks until no read snapshots are open.
-   */
-  void WaitForSnapshots ();
-
-  /**
    * Decrements the count of outstanding snapshots.
    */
   void UnrefSnapshot () const;
@@ -394,12 +397,6 @@ private:
 protected:
 
   /**
-   * Closes the database, making sure to wait for all outstanding snapshots.
-   * The method is overridden (extended) in the SQLiteGame::Storage subclass.
-   */
-  virtual void CloseDatabase ();
-
-  /**
    * Sets up the database schema if it does not already exist.  This function is
    * called after opening the database, including when it was first created (but
    * not only then).  It creates the required tables if they do not yet exist.
@@ -410,6 +407,13 @@ protected:
    * implementation.
    */
   virtual void SetupSchema ();
+
+  /**
+   * Blocks until no read snapshots are open.  This method is overwritten
+   * in the SQLiteGame::Storage class, to add logic for explicitly closing
+   * snapshots retained by the class itself.
+   */
+  virtual void WaitForSnapshots ();
 
   /**
    * Returns the underlying SQLiteDatabase instance.
@@ -449,6 +453,12 @@ public:
   void operator= (const SQLiteStorage&) = delete;
 
   void Initialise () override;
+
+  /**
+   * Closes the database, making sure to wait for all outstanding snapshots.
+   * The method is overridden (extended) in the SQLiteGame::Storage subclass.
+   */
+  virtual void CloseDatabase ();
 
   /**
    * Clears the storage.  This deletes and re-creates the full database,
