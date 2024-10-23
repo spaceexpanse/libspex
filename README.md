@@ -1,4 +1,4 @@
-# Xaya Game Library
+# Xaya Game Library 
 
 `libxayagame` is a C++ library that makes it easy to implement games on the
 [Xaya platform](https://xaya.io/).  It takes care of the interaction with
